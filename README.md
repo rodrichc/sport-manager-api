@@ -14,7 +14,7 @@ API RESTful construida con arquitectura escalable, tipado estático y seguridad 
 * **ORM:** Prisma
 * **Seguridad:** JWT (Auth) & Bcrypt (Hash)
 * **Validaciones:** Express-Validator
-* **Documentación:** Postman / Swagger (Próximamente)
+* **Documentación:** Postman Collection
 
 ---
 
@@ -68,10 +68,14 @@ El sistema se basa en una jerarquía de **SaaS (Software as a Service)** diseña
 
 ## 🚀 Cómo levantar el proyecto
 
-1.  **Instalar dependencias:**
-    ```bash
-    npm install
-    ```
+Seguí estos pasos para levantar el backend en tu máquina local:
+
+### 1. Clonar e Instalar
+```bash
+git clone [https://github.com/TU_USUARIO/sport-manager-api.git](https://github.com/TU_USUARIO/sport-manager-api.git)
+cd sport-manager-api
+npm install
+```
 
 2.  **Configurar variables de entorno (`.env`):**
     Crea un archivo `.env` en la raíz y completa:
@@ -82,7 +86,25 @@ El sistema se basa en una jerarquía de **SaaS (Software as a Service)** diseña
     FRONTEND_URL="http://localhost:5173"
     ```
 
-3.  **Correr en modo desarrollo:**
+3.  **Base de Datos (Prisma):**
+   Una vez configurado el .env, ejecutá las migraciones para crear las tablas en tu base de datos:
+    ```bash
+    npx prisma migrate dev
+    ```
+
+4.  **Correr en modo desarrollo:**
     ```bash
     npm run dev
     ```
+
+## 🧪 Testing con Postman
+
+Este repositorio incluye la colección de Postman lista para usar.
+
+1.  Buscá la carpeta `/postman` en la raíz del proyecto.
+2.  Importá el archivo `sport-manager.postman_collection.json` en tu Postman.
+3.  Importá el archivo de entorno `sport-manager.postman_environment.json`.
+4.  Seleccioná el entorno **"sport-manager"**.
+5.  **¡Listo!** Ya podés hacer peticiones al servidor local.
+
+> **Nota:** El endpoint de **Login** guarda automáticamente el Token en la variable de entorno, por lo que no hace falta copiarlo manualmente para usar los endpoints protegidos. ¡Solo logueate y seguí probando!
