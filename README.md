@@ -51,10 +51,10 @@ El sistema se basa en una jerarquía de **SaaS (Software as a Service)** diseña
 - [x] **Get User:** Endpoint para obtener datos del perfil (Ruta Protegida).
 
 ### 📍 FASE 2: Estructura del Negocio (Próximos Pasos)
-- [ ] **Modelado DB:** Crear tablas `Complex` y `Court` en Prisma.
-- [ ] **CRUD Complejos:**
-    - [ ] Endpoint `POST /complexes` (Crear sucursal - Solo Owner).
-    - [ ] Endpoint `GET /complexes` (Listar complejos propios).
+- [x] **Modelado DB:** Crear tablas `Complex` y `Court` en Prisma.
+- [x] **CRUD Complejos:**
+    - [x] Endpoint `POST /complexes` (Crear sucursal - Solo Owner).
+    - [x] Endpoint `GET /complexes` (Listar complejos propios).
 - [ ] **CRUD Canchas:**
     - [ ] Endpoint `POST /complexes/:id/courts` (Agregar cancha a un complejo).
     - [ ] Validaciones de deporte y precio.
