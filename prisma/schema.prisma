@@ -8,11 +8,35 @@ datasource db {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  name      String
-  email     String  @unique
-  username  String  @unique
-  password  String
-  role      String  @default("USER")
-  confirmed Boolean @default(false)
+  id          Int     @id @default(autoincrement())
+  name        String
+  email       String  @unique
+  username    String  @unique
+  password    String
+  role        String  @default("USER")
+  confirmed   Boolean @default(false)
+  phoneNumber String?
+  complexes   Complex[]
+}
+
+model Complex {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  address     String
+  lat         Float?    //  (Ex: -34.6037)
+  lng         Float?    //  (Ex: -58.3816) 
+  logo        String?  
+  openTime    String   
+  closeTime   String   
+  status      String   @default("PENDING")
+  
+  ownerId     Int
+  owner       User     @relation(fields: [ownerId], references: [id])
+
+  createdAt   DateTime @default(now())  
+  updatedAt   DateTime @updatedAt       
+  deletedAt   DateTime?
+  
+  // courts      Court[] 
 }

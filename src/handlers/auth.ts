@@ -6,10 +6,10 @@ import { generateJWT } from "../utils/jwt"
 
 
 export const createAccount = async (req: Request, res: Response) => {
-    const { password, email, name, role } = req.body
+
+    const { password, email, name, role, phoneNumber } = req.body
 
     try {
-        // Corrobora si el usuario, email, ya esta registrado
         const emailExist = await db.user.findUnique({
             where: { email }
         })
@@ -19,10 +19,9 @@ export const createAccount = async (req: Request, res: Response) => {
             return res.status(409).json({error: error.message})
         }
 
-        //Formateo de nombre de usuario
+
         const username = slug(req.body.username, '')
 
-        // Corrobora el username está registrado
         const usernameExist = await db.user.findUnique({
             where: { username }
         })
@@ -32,17 +31,22 @@ export const createAccount = async (req: Request, res: Response) => {
             return res.status(409).json({error: error.message})
         }
 
-        //Hasheo password
+
+        if (role === 'OWNER' && !phoneNumber) {
+             const error = new Error('Los dueños deben registrar un teléfono de contacto')
+             return res.status(400).json({error: error.message})
+        }
+
         const hashedPassword = await hashPassword(password)
 
-        //Crear usuario en base de datos
         const user = await db.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
                 username,
-                role
+                role,
+                phoneNumber
             }
         })
 
@@ -61,7 +65,6 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body
 
     try {
-        // Buscar al usuario
         const user = await db.user.findUnique({
             where: { email }
         })
@@ -78,25 +81,51 @@ export const login = async (req: Request, res: Response) => {
         }
         */
 
-        // Comprobar password
         const isPasswordCorrect = await checkPassword(password, user.password)
-
 
         if(!isPasswordCorrect) {
             const error = new Error('Password incorrecto')
             return res.status(403).json({error: error.message})
         }
 
-        
-        // 4. Generar Token (JWT)
         const token = generateJWT({ 
             id: user.id 
         })
 
-        // 5. Mandar el token al cliente
         res.send(token)
 
     } catch (error) {
         res.status(500).json({error: 'Hubo un error'})
+    }
+}
+
+
+export const getUser = async (req: Request, res: Response) => {
+    res.json(req.user) 
+}
+
+
+export const becomeOwner = async (req: Request, res: Response) => {
+    const { phoneNumber } = req.body
+    const { id } = req.user!
+
+    try {
+
+        if (req.user?.role === 'OWNER') {
+             return res.status(400).json({error: 'Ya sos dueño.'})
+        }
+
+        const user = await db.user.update({
+            where: { id },
+            data: {
+                role: 'OWNER',
+                phoneNumber 
+            }
+        })
+
+        res.json({ msg: '¡Felicitaciones! Ahora podes administrar tus complejos deportivos.' })
+
+    } catch (error) {
+        res.status(500).json({error: 'Hubo un error al actualizar el perfil'})
     }
 }
