@@ -7,7 +7,7 @@ import { validateCreateComplex, validateRestoreComplex, validateUpdateComplex, v
 const router = Router()
 
 //Routing
-router.post('/create', 
+router.post('/', 
     authenticate,
     validateCreateComplex,
     createComplex)

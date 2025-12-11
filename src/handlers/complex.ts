@@ -46,7 +46,7 @@ export const getComplexes = async (req: Request, res: Response) => {
                     select: {
                         name: true,
                         email: true,
-                        phoneNumber: true // <--- ¡EL DATO CLAVE!
+                        phoneNumber: true
                     }
                 }
             }
