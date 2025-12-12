@@ -1,17 +1,24 @@
 import { db } from "../../config/db";
-import { complexId, CreateCourtDTO, userId } from "./court.types";
+import { CreateCourtDTO, complexId, userId } from "./court.types";
 
-export const courtRepository = {
-    findComplexOwner: async (complexId: complexId, userId: userId) => {
+export class CourtRepository {
+
+    async findComplexOwner(complexId: complexId, userId: userId) {
         return await db.complex.findFirst({
             where: {
                 id: complexId,
                 ownerId: userId
             }
-        })
-    },
+        });
+    }
 
-    create(data: CreateCourtDTO) {
-        return db.court.create({ data });
-    },
+    async create(data: CreateCourtDTO) {
+        return await db.court.create({ data });
+    }
+
+    async findAllActiveCourts() {
+        return await db.court.findMany({
+            where: { isActive: true }
+        });
+    }
 }

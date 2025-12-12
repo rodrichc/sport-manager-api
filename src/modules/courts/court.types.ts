@@ -6,3 +6,12 @@ export type CreateCourtDTO = Omit<Court, 'id' | 'createdAt' | 'updatedAt' | 'del
 export type userId = User['id']
 
 export type complexId = Complex['id']
+
+export interface CourtFilters {
+    sport?: string;
+    isIndoor?: boolean;
+    
+    latitude?: number;  
+    longitude?: number; 
+    radius?: number;    
+}

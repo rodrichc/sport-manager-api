@@ -1,25 +1,22 @@
 import { Router } from 'express'
-import { CourtController } from './court.controller'
 import { authenticate } from '../../middleware/authenticate'
-import { optionalAuthenticate } from '../../middleware/optionalAuth'
 import { validateCreateCourt } from './court.validator'
+import { courtController } from './courts.dependencies'
 
 const router = Router()
 
 router.post('/',
     authenticate, 
     validateCreateCourt, 
-    CourtController.create)
+    courtController.create)
 
-router.get('/', 
-    optionalAuthenticate, 
-    CourtController.getCourts)
+router.get('/', courtController.getCourts)
 
-router.patch('/:id', authenticate, CourtController.updateCourt)
+// router.patch('/:id', authenticate, courtController.updateCourt)
 
-router.delete('/:id', authenticate, CourtController.deleteCourt)
+// router.delete('/:id', authenticate, courtController.deleteCourt)
 
-router.get('/my-courts', authenticate, CourtController.getMyCourts)
+// router.get('/my-courts', authenticate, courtController.getMyCourts)
 
 
 export default router
