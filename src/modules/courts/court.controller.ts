@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import { CourtService } from "./court.service";
-import { CreateCourtDTO } from "./court.types";
+import { Request, Response } from "express"
+import { CourtService } from "./court.service"
+import { CreateCourtDTO } from "./court.types"
 
 export class CourtController {
 
@@ -18,7 +18,7 @@ export class CourtController {
                 data: newCourt 
             });
 
-        } catch (error: any) {
+        } catch (error) {
             if (error.message === 'PERMISO_DENEGADO') {
                 return res.status(403).json({ error: 'No tenés permiso para crear canchas en este complejo' });
             }

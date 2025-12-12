@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/authenticate'
 import { validateCreateCourt } from './court.validator'
-import { courtController } from './courts.dependencies'
+import { courtController } from './court.dependencies'
 
 const router = Router()
 

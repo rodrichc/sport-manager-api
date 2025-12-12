@@ -1,5 +1,5 @@
 import { Router } from "express"
-import authRoutes from "./routes/authRoutes"
+import authRoutes from "./modules/auth/auth.routes"
 import complexRoutes from "./routes/complexRoutes"
 import courtRoutes from "./modules/courts/court.routes"
 

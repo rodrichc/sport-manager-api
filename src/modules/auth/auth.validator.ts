@@ -1,5 +1,5 @@
 import { body } from 'express-validator'
-import { handleInputErrors } from '../middleware/validation'
+import { handleInputErrors } from '../../middleware/validation'
 
 
 export const validateRegister = [

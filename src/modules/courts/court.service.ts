@@ -1,5 +1,6 @@
+import { userId } from "../../types";
 import { CourtRepository } from "./court.repository"
-import { CreateCourtDTO, userId } from "./court.types"
+import { CreateCourtDTO } from "./court.types"
 
 export class CourtService {
     

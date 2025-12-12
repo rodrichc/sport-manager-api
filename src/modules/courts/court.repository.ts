@@ -1,5 +1,6 @@
 import { db } from "../../config/db";
-import { CreateCourtDTO, complexId, userId } from "./court.types";
+import { userId } from "../../types";
+import { CreateCourtDTO, complexId } from "./court.types";
 
 export class CourtRepository {
 
