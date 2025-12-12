@@ -1,110 +1,113 @@
 # 🏟️ SportManager API (SaaS)
 
-Plataforma de gestión integral para complejos deportivos (Pádel, Fútbol, Tenis, etc.).
-API RESTful construida con arquitectura escalable, tipado estático y seguridad industrial.
+> **🚧 ESTADO DEL PROYECTO: EN DESARROLLO ACTIVO (MVP)**
+> Código en construcción.
+> * **Foco actual:** Implementación del módulo de Canchas (Filtros y Geolocalización).
+> * **Próximos pasos:** Lógica de reservas y disponibilidad horaria.
 
 ---
 
-## 🛠️ Tech Stack (Las Herramientas)
+## 📖 Descripción
+
+**SportManager** es una plataforma SaaS (Software as a Service) diseñada para la gestión integral de complejos deportivos. Permite a los dueños administrar múltiples sucursales, canchas y servicios, y a los jugadores buscar y reservar turnos en tiempo real.
+
+El proyecto está construido con un enfoque en **Arquitectura Limpia (Clean Architecture)**, escalabilidad y seguridad.
+
+## 🛠️ Tech Stack
 
 * **Runtime:** Node.js
-* **Framework:** Express.js
 * **Lenguaje:** TypeScript
+* **Framework:** Express.js
 * **Base de Datos:** PostgreSQL
 * **ORM:** Prisma
-* **Seguridad:** JWT (Auth) & Bcrypt (Hash)
+* **Arquitectura:** Layered Pattern (Controller - Service - Repository)
+* **Seguridad:** JWT (Auth), Bcrypt (Hashing), CORS
 * **Validaciones:** Express-Validator
-* **Documentación:** Postman Collection
 
 ---
 
-## 🧠 Modelo de Negocio (Arquitectura)
+## 🏗️ Arquitectura del Proyecto
 
-El sistema se basa en una jerarquía de **SaaS (Software as a Service)** diseñada para escalar:
+El sistema sigue una arquitectura modular en capas para asegurar la separación de responsabilidades:
 
-1.  **USER (Global):**
-    * **Jugador (`USER`):** Busca canchas, reserva turnos y ve su historial.
-    * **Dueño (`OWNER`):** Administra sus complejos, canchas y ganancias.
-
-2.  **COMPLEX (La Sucursal):**
-    * Pertenece a un Dueño (Owner).
-    * Gestiona ubicación, horarios de apertura/cierre y servicios (WiFi, Bar, Estacionamiento).
-
-3.  **COURT (El Recurso):**
-    * Pertenece a un Complejo (Complex).
-    * Define atributos específicos: Deporte (Pádel, Fútbol), Superficie, Techada/Descubierta y Precio.
-
-4.  **BOOKING (La Transacción):**
-    * Reserva atómica de un Usuario en una Cancha en un horario específico.
-
----
-
-## 🚧 ROADMAP & PROGRESO
-
-### 📍 FASE 1: Cimientos & Seguridad (Estado Actual)
-- [x] Configuración inicial (TS, Express, CORS).
-- [x] Conexión a Base de Datos (Prisma + Neon).
-- [x] **Modelo User:** Definición con Roles (`USER`/`OWNER`).
-- [x] **Registro:** Hash de password, validación de duplicados, Slug para username.
-- [x] **Middleware Auth:** Validación del Bearer Token y protección de rutas.
-- [x] **Login:** Generación de JWT y autenticación de usuarios.
-- [x] **Get User:** Endpoint para obtener datos del perfil (Ruta Protegida).
-
-### 📍 FASE 2: Estructura del Negocio (Próximos Pasos)
-- [x] **Modelado DB:** Crear tablas `Complex` y `Court` en Prisma.
-- [x] **CRUD Complejos:**
-    - [x] Endpoint `POST /complexes` (Crear sucursal - Solo Owner).
-    - [x] Endpoint `GET /complexes` (Listar complejos propios).
-- [ ] **CRUD Canchas:**
-    - [ ] Endpoint `POST /complexes/:id/courts` (Agregar cancha a un complejo).
-    - [ ] Validaciones de deporte y precio.
-
-### 📍 FASE 3: El Core (Turnos y Disponibilidad)
-- [ ] **Modelado DB:** Crear tabla `Booking`.
-- [ ] **Lógica de Disponibilidad:** Algoritmo para evitar solapamiento de horarios.
-- [ ] **Endpoint Reservar:** `POST /bookings`.
-
----
-
-## 🚀 Cómo levantar el proyecto
-
-Seguí estos pasos para levantar el backend en tu máquina local:
-
-### 1. Clonar e Instalar
-```bash
-git clone [https://github.com/TU_USUARIO/sport-manager-api.git](https://github.com/TU_USUARIO/sport-manager-api.git)
-cd sport-manager-api
-npm install
+```text
+src/
+├── config/           # Configuración de DB y entorno
+├── middlewares/      # Auth, Error Handling, Validations
+├── modules/          # Módulos de negocio
+│   ├── auth/         # Lógica de registro y login
+│   ├── complex/      # Gestión de complejos/sucursales
+│   └── courts/       # Gestión de canchas y filtros
+├── types/            # Definiciones de tipos globales
+└── utils/            # Helpers y utilidades
 ```
 
-2.  **Configurar variables de entorno (`.env`):**
-    Crea un archivo `.env` en la raíz y completa:
-    ```env
-    PORT=3000
-    DATABASE_URL="tu_url_de_postgress_aqui"
-    JWT_SECRET="tu_palabra_secreta"
-    FRONTEND_URL="http://localhost:5173"
+---
+
+### 🌟 Features Técnicas Destacadas
+* **Clean Architecture:** Lógica de negocio aislada en Servicios y acceso a datos en Repositorios.
+* **Soft Delete:** Implementación de borrado lógico para preservar integridad de datos.
+* **Type Safety:** Uso de Interfaces y DTOs para evitar errores en tiempo de ejecución.
+* **Advanced Filtering:** Endpoints con capacidad de filtrado dinámico (por deporte, techado/descubierto).
+
+---
+
+## 🧠 Modelo de Negocio
+
+La lógica se basa en una jerarquía relacional:
+
+1.  **OWNER (Dueño):** Crea y administra sus complejos.
+2.  **COMPLEX (Sucursal):** Posee ubicación y servicios.
+3.  **COURT (Cancha):** El recurso reservable con atributos específicos (Superficie, Precio).
+4.  **BOOKING (Reserva):** La transacción final que bloquea disponibilidad.
+
+---
+
+## 🚀 Estado del Proyecto y Próximos Pasos
+
+Actualmente el sistema cuenta con los módulos de **Autenticación (Auth)**, **Usuarios** y **Gestión de Complejos** (Sucursales) totalmente funcionales.
+
+El desarrollo se encuentra **activo hoy mismo** en la finalización del **Módulo de Canchas**, trabajando específicamente en:
+1.  Lógica de filtrado avanzado (por deporte, superficie, techado).
+2.  Algoritmo de búsqueda por Geolocalización (Canchas cercanas).
+3.  Próximamente: Implementación del motor de reservas (Bookings).
+
+---
+
+## 🚀 Instalación y Uso Local
+
+1.  **Clonar el repositorio:**
+    ```bash
+      git clone https://github.com/rodrichc/sport-manager-api.git
     ```
 
-3.  **Base de Datos (Prisma):**
-   Una vez configurado el .env, ejecutá las migraciones para crear las tablas en tu base de datos:
+2.  **Instalar dependencias:**
+    ```bash
+    npm install
+    ```
+
+3.  **Configurar variables de entorno:**
+    Crea un archivo `.env` basado en el siguiente ejemplo:
+    ```env
+    PORT=3000
+    DATABASE_URL="postgresql://usuario:password@host:port/db"
+    JWT_SECRET="frase_secreta_super_segura"
+    ```
+
+4.  **Base de Datos:**
     ```bash
     npx prisma migrate dev
     ```
 
-4.  **Correr en modo desarrollo:**
+5.  **Iniciar servidor:**
     ```bash
-    npm run dev
+    npm run dev:api
     ```
+
+---
 
 ## 🧪 Testing con Postman
 
-Este repositorio incluye la colección de Postman lista para usar.
+En la carpeta `/postman` encontrarás la colección completa para importar.
 
-1.  Buscá la carpeta `/postman` en la raíz del proyecto.
-2.  Importá el archivo `sport-manager.postman_collection.json` en tu Postman.
-3.  Importá el archivo de entorno `sport-manager.postman_environment.json`.
-4.  Seleccioná el entorno **"sport-manager"**.
-5.  **¡Listo!** Ya podés hacer peticiones al servidor local.
-
-> **Nota:** El endpoint de **Login** guarda automáticamente el Token en la variable de entorno, por lo que no hace falta copiarlo manualmente para usar los endpoints protegidos. ¡Solo logueate y seguí probando!
+> **💡 Tip:** El endpoint de Login guarda automáticamente el token en las variables de entorno de Postman. Logueate y probá los endpoints.
