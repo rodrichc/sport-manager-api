@@ -1,4 +1,4 @@
-import { userId } from "../../types";
+import { userId } from "../../types"
 import { CourtRepository } from "./court.repository"
 import { CreateCourtDTO } from "./court.types"
 
@@ -8,16 +8,16 @@ export class CourtService {
 
     async createCourt(userId: userId, courtData: CreateCourtDTO) {
 
-        const complex = await this.courtRepository.findComplexOwner(courtData.complexId, userId);
+        const complex = await this.courtRepository.findComplexOwner(courtData.complexId, userId)
         
         if (!complex) {
-            throw new Error('PERMISO_DENEGADO');
+            throw new Error('PERMISO_DENEGADO')
         }
 
-        return await this.courtRepository.create(courtData);
+        return await this.courtRepository.create(courtData)
     }
 
     async getCourts() {
-        return await this.courtRepository.findAllActiveCourts();
+        return await this.courtRepository.findAllActiveCourts()
     }
 }

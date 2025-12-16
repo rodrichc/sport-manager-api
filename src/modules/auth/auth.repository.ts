@@ -28,7 +28,7 @@ export class AuthRepository {
     }
 
     async updateToOwner(id: userId, phoneNumber: userPhoneNumber) {
-        return db.user.update({
+        return await db.user.update({
             where: { id },
             data: { 
                 role: 'OWNER',

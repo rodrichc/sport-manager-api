@@ -180,7 +180,7 @@ export const getDeletedComplexes = async (req: Request, res: Response) => {
         const deleted = await db.complex.findMany({
             where: {
                 ownerId: userId,
-                deletedAt: { not: null } // <--- EL TRUCO: Solo traer los borrados
+                deletedAt: { not: null }
             }
         })
 
