@@ -1,4 +1,4 @@
-import { Complex, Court, User } from '@prisma/client'
+import { Court } from '@prisma/client'
 
 
 export type CreateCourtDTO = Omit<Court, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>

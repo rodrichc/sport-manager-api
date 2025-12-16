@@ -1,11 +1,10 @@
 import slug from "slug"
 import { AuthRepository } from "./auth.repository"
-import { CreateAccountDTO, LoginDTO, userPhoneNumber } from "./auth.types"
+import { CreateAccountDTO, LoginDTO, UserPhoneNumber } from "./auth.types"
 import { checkPassword, hashPassword } from "../../utils/auth"
 import { AppError } from "../../utils/appError"
 import { generateJWT } from "../../utils/jwt"
-import { userId, UserSafe } from "../../types"
-import { User } from "@prisma/client"
+import { UserSafe } from "../../types"
 
 
 export class AuthService {
@@ -75,7 +74,7 @@ export class AuthService {
     }
 
 
-    async becomeOwner(user: UserSafe, phoneNumber: userPhoneNumber) {
+    async becomeOwner(user: UserSafe, phoneNumber: UserPhoneNumber) {
         if(user.role === 'OWNER') {
             throw new AppError('Ya sos dueño', 400)
         }
