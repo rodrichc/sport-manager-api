@@ -1,6 +1,8 @@
-import { User } from '@prisma/client'
+import { Complex, User } from '@prisma/client'
 
 
 export type UserSafe = Pick<User, 'id' | 'name' | 'email' | 'username' | 'role'>
 
-export type userId = User['id']
+export type UserId = User['id']
+
+export type ComplexId = Complex["id"]

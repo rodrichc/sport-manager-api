@@ -1,7 +1,6 @@
 import { Request, Response } from "express"
 import { AuthService } from "./auth.service"
 import { CreateAccountDTO, LoginDTO } from "./auth.types"
-import { AppError } from "../../utils/appError"
 import { catchAsync } from "../../utils/catchAsync"
 
 export class AuthController {

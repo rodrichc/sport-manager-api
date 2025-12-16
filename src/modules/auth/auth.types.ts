@@ -1,10 +1,11 @@
 import { User } from "@prisma/client"
 
-export type userEmail = User['email']
 
-export type username = User['username']
+export type UserEmail = User['email']
 
-export type userPhoneNumber = User['phoneNumber']
+export type Username = User['username']
+
+export type UserPhoneNumber = User['phoneNumber']
 
 export type CreateAccountDTO = Pick<User, 'name' | 'email' | 'password' | 'username' | 'role' | 'phoneNumber'>
 

@@ -1,7 +1,6 @@
 import { db } from "../../config/db"
-import { userId } from "../../types"
-import { complexId } from "../courts/court.types"
-import { CreateComplexDTO, DeleteComplexDTO, findComplexesCondition, idComplex, UpdateComplexDTO } from "./complex.types"
+import { ComplexId, UserId } from "../../types"
+import { CreateComplexDTO, DeleteComplexDTO, FindComplexesCondition, UpdateComplexDTO } from "./complex.types"
 
 export class ComplexRepository {
 
@@ -11,13 +10,13 @@ export class ComplexRepository {
         })
     }
 
-    async findAll(whereCondition: findComplexesCondition) {
+    async findAll(whereCondition: FindComplexesCondition) {
         return await db.complex.findMany({
             where: whereCondition
         })
     }
 
-    async findById(id: idComplex) {
+    async findById(id: ComplexId) {
         return await db.complex.findUnique({
             where: {
                 id
@@ -25,7 +24,7 @@ export class ComplexRepository {
         })
     }
     
-    async findActiveById(id: idComplex){
+    async findActiveById(id: ComplexId){
         return await db.complex.findFirst({
             where: {
                 id,
@@ -34,7 +33,7 @@ export class ComplexRepository {
         })
     }
 
-    async update(id: idComplex, data: UpdateComplexDTO) {
+    async update(id: ComplexId, data: UpdateComplexDTO) {
         return await db.complex.update({
             where: {
                 id
@@ -43,14 +42,14 @@ export class ComplexRepository {
         })
     }
 
-    async softDelete(id: idComplex, data: DeleteComplexDTO){
+    async softDelete(id: ComplexId, data: DeleteComplexDTO){
         return await db.complex.update({
             where: { id },
             data
         })
     }
 
-    async findActiveByOwner(id: userId){
+    async findActiveByOwner(id: UserId){
         return await db.complex.findMany({
             where: {
                 id,
@@ -59,7 +58,7 @@ export class ComplexRepository {
         })
     }
 
-    async findDeletedByOwner(id: userId){
+    async findDeletedByOwner(id: UserId){
         return await db.complex.findMany({
             where: {
                 id,
@@ -68,7 +67,7 @@ export class ComplexRepository {
         })
     }
 
-    async restore(id: idComplex){
+    async restore(id: ComplexId){
         return await db.complex.update({
             where: { id },
             data: { deletedAt: null }

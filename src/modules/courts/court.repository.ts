@@ -1,10 +1,10 @@
 import { db } from "../../config/db"
-import { userId } from "../../types"
-import { CreateCourtDTO, complexId } from "./court.types"
+import { UserId, ComplexId } from "../../types"
+import { CreateCourtDTO } from "./court.types"
 
 export class CourtRepository {
 
-    async findComplexOwner(complexId: complexId, userId: userId) {
+    async findComplexOwner(complexId: ComplexId, userId: UserId) {
         return await db.complex.findFirst({
             where: {
                 id: complexId,

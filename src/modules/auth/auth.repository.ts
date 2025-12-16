@@ -1,11 +1,11 @@
 import { db } from "../../config/db"
-import { userId } from "../../types"
-import { CreateAccountDTO, userEmail, username, userPhoneNumber } from "./auth.types"
+import { UserId } from "../../types"
+import { CreateAccountDTO, UserEmail, Username, UserPhoneNumber } from "./auth.types"
 
 
 export class AuthRepository {
 
-    async findUserForEmail(email: userEmail) {
+    async findUserForEmail(email: UserEmail) {
         return await db.user.findFirst({
             where: {
                 email
@@ -13,7 +13,7 @@ export class AuthRepository {
         })
     }
 
-    async findUserForUsername(username: username) {
+    async findUserForUsername(username: Username) {
         return await db.user.findFirst({
             where: {
                 username
@@ -27,7 +27,7 @@ export class AuthRepository {
         })
     }
 
-    async updateToOwner(id: userId, phoneNumber: userPhoneNumber) {
+    async updateToOwner(id: UserId, phoneNumber: UserPhoneNumber) {
         return await db.user.update({
             where: { id },
             data: { 
