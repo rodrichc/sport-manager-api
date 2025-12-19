@@ -1,6 +1,6 @@
 import { db } from "../../config/db"
 import { ComplexId, UserId } from "../../types"
-import { CreateComplexDTO, DeleteComplexDTO, FindComplexesCondition, UpdateComplexDTO } from "./complex.types"
+import { CreateComplexDTO, DeleteComplexDTO, UpdateComplexDTO } from "./complex.types"
 
 export class ComplexRepository {
 
@@ -10,9 +10,12 @@ export class ComplexRepository {
         })
     }
 
-    async findAll(whereCondition: FindComplexesCondition) {
+    async findAllActive() {
         return await db.complex.findMany({
-            where: whereCondition
+            where: {
+                status: 'APPROVED',
+                deletedAt: null
+            }
         })
     }
 
