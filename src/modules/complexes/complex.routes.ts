@@ -2,6 +2,7 @@ import { Router } from "express"
 import { authenticate } from "../../middleware/authenticate"
 import { optionalAuthenticate } from "../../middleware/optionalAuth"
 import { validateCreateComplex, validateRestoreComplex, validateUpdateComplex, validateUpdateComplexStatus } from "./complex.validator"
+import { complexController } from "./complex.dependencies"
 
 const router = Router()
 
@@ -9,39 +10,39 @@ const router = Router()
 router.post('/', 
     authenticate,
     validateCreateComplex,
-    createComplex)
+    complexController.create)
         
 router.get('/', 
     optionalAuthenticate, 
-    getComplexes)
+    complexController.getAll)
 
 router.patch('/:id', 
     authenticate,
     validateUpdateComplex,
-    updateComplex)
+    complexController.update)
 
 router.delete('/:id',
     authenticate,
-    deleteComplex)
+    complexController.delete)
 
 router.get('/my-complexes', 
     authenticate, 
-    getMyComplexes)
+    complexController.getMyActiveComplexes)
 
 router.get('/my-deleted',
     authenticate, 
-    getDeletedComplexes)
+    complexController.getMyDeletedComplexes)
 
 router.patch('/:id/restore',
     authenticate,
     validateRestoreComplex,
-    restoreComplex
+    complexController.restore
 )
 
 router.patch('/:id/status', 
     authenticate,
     validateUpdateComplexStatus,
-    updateComplexStatus)
+    complexController.updateStatus)
     
 
     

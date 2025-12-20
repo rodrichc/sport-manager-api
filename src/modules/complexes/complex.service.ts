@@ -24,14 +24,14 @@ export class ComplexService {
 
     async update(data: UpdateComplexDTO, user: UserSafe, id: ComplexId) {
         const complex = await this.complexRepository.findActiveById(id)
-        await this.getComplexOrThrow(complex, user)
+        this.getComplexOrThrow(complex, user)
 
         return await this.complexRepository.update(id, data)
     }
 
     async delete(user: UserSafe, id: ComplexId) {
         const complex = await this.complexRepository.findActiveById(id)
-        await this.getComplexOrThrow(complex, user)
+        this.getComplexOrThrow(complex, user)
 
         return await this.complexRepository.softDelete(id, {deletedAt: new Date()})
     }
@@ -44,10 +44,10 @@ export class ComplexService {
         return await this.complexRepository.findDeletedByOwner(user.id)
     }
 
-    async restore(id: ComplexId, user: UserSafe) {
+    async restore(user: UserSafe, id: ComplexId) {
         const complex = await this.complexRepository.findById(id)
 
-        await this.getComplexOrThrow(complex, user)
+        this.getComplexOrThrow(complex, user)
 
         if(!complex.deletedAt){
             throw new AppError("El complejo no está eliminado", 400)
@@ -56,7 +56,7 @@ export class ComplexService {
         return await this.complexRepository.restore(id)
     }
 
-    async updateStatus(id: ComplexId, user: UserSafe, status: ComplexStatus) {
+    async updateStatus(user: UserSafe, id: ComplexId, status: ComplexStatus) {
         if(user.role !== "ADMIN") {
             throw new AppError('Acción no autorizada. Solo Administradores', 403)
         }
@@ -66,7 +66,7 @@ export class ComplexService {
 
 
 
-    private async getComplexOrThrow(complex: Complex | null, user: UserSafe) {
+    private getComplexOrThrow(complex: Complex | null, user: UserSafe) {
         if(!complex){
             throw new AppError('Complejo no encontrado', 404)
         }
