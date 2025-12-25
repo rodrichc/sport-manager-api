@@ -1,39 +1,95 @@
 import { Request, Response } from "express"
 import { CourtService } from "./court.service"
-import { CreateCourtDTO } from "./court.types"
+import { CourtDTO } from "./court.types"
+import { catchAsync } from "../../utils/catchAsync"
 
 export class CourtController {
 
     constructor(private readonly courtService: CourtService) {}
 
-    create = async (req: Request, res: Response) => {
-        const userId = req.user?.id
-        const courtData: CreateCourtDTO = req.body
+    create = catchAsync(async (req: Request, res: Response) => {
+        const userId = req.user.id
+        const courtData: CourtDTO = req.body
 
-        try {
-            const newCourt = await this.courtService.createCourt(userId!, courtData)
-            
-            res.status(201).json({ 
-                message: 'Cancha creada con éxito', 
-                data: newCourt 
-            })
+        const newCourt = await this.courtService.create(userId, courtData)
+        
+        res.status(201).json({ 
+            message: 'Cancha creada con éxito', 
+            data: newCourt 
+        })
+    })
 
-        } catch (error) {
-            if (error.message === 'PERMISO_DENEGADO') {
-                return res.status(403).json({ error: 'No tenés permiso para crear canchas en este complejo' })
-            }
-            console.error(error)
-            res.status(500).json({ error: 'Error al crear la cancha' })
-        }
-    }
+    getById = catchAsync(async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
 
-    getCourts = async (req: Request, res: Response) => {
-         try {
-            const courts = await this.courtService.getCourts()
-            res.json({ data: courts })
-        } catch (error) {
-            console.error(error)
-            res.status(500).json({ error: 'Error al obtener las canchas' })
-        }
-    }
+        const court = await this.courtService.findActive(id)
+
+        res.json(court)
+    })
+
+    update = catchAsync(async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
+        const userId = req.user.id
+        const courtData = req.body
+
+        const updatedCourt = await this.courtService.update(id, userId, courtData)
+
+        res.json(updatedCourt)
+    })
+
+    delete = catchAsync(async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
+        const userId = req.user.id
+
+        await this.courtService.delete(id, userId)
+
+        res.json({
+            message: 'Cancha eliminada correctamente.'
+        })
+    })
+
+    getAll = catchAsync(async (req: Request, res: Response) => {
+        const courts = await this.courtService.findAll()
+
+        res.json({ data: courts })
+    })
+
+    getUserCourts = catchAsync(async (req: Request, res: Response) => {
+        const userId = req.user.id
+
+        const courts = await this.courtService.findCourtsUser(userId)
+
+        res.json({ data: courts })
+    })
+
+    getDeletedUserCourts = catchAsync(async (req: Request, res: Response) => {
+        const userId = req.user.id
+
+        const courts = await this.courtService.findDeletedCourtsUser(userId)
+
+        res.json({ data: courts })
+    })
+
+    restore = catchAsync(async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
+        const userId = req.user.id
+
+        const court = await this.courtService.restore(id, userId)
+
+        res.json({ 
+            message: "Cancha restaurada correctamente",
+            court
+         })
+    })
+
+    hardDelete = catchAsync(async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
+        const userId = req.user.id
+
+        await this.courtService.hardDelete(id, userId)
+
+        res.json({
+            message: "Cancha eliminada correctamente"
+        })
+    })
 }

@@ -1,7 +1,9 @@
 import { Court } from '@prisma/client'
 
 
-export type CreateCourtDTO = Omit<Court, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
+export type CourtDTO = Omit<Court, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
+
+export type DeleteCourtDTO = Pick<Court, "deletedAt" | "isActive">
 
 export interface CourtFilters {
     sport?: string
