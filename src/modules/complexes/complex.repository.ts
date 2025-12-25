@@ -76,4 +76,10 @@ export class ComplexRepository {
             data: { deletedAt: null }
         })
     }
+
+    async hardDelete(id: ComplexId) {
+        return db.complex.delete({
+            where: { id }
+        })
+    }
 }

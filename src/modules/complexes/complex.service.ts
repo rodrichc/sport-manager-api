@@ -56,6 +56,18 @@ export class ComplexService {
         return await this.complexRepository.restore(id)
     }
 
+    async hardDelete(user: UserSafe, id: ComplexId) {
+        const complex = await this.complexRepository.findById(id)
+
+        this.getComplexOrThrow(complex, user)
+
+        if(!complex.deletedAt){
+            throw new AppError("El complejo no está eliminado", 400)
+        }
+
+        return await this.complexRepository.hardDelete(id)
+    }
+
     async updateStatus(user: UserSafe, id: ComplexId, status: ComplexStatus) {
         if(user.role !== "ADMIN") {
             throw new AppError('Acción no autorizada. Solo Administradores', 403)

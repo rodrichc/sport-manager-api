@@ -16,6 +16,14 @@ router.get('/',
     optionalAuthenticate, 
     complexController.getAll)
 
+router.get('/my-complexes', 
+    authenticate, 
+    complexController.getMyActiveComplexes)
+
+router.get('/my-deleted',
+    authenticate, 
+    complexController.getMyDeletedComplexes)
+
 router.patch('/:id', 
     authenticate,
     validateUpdateComplex,
@@ -24,14 +32,6 @@ router.patch('/:id',
 router.delete('/:id',
     authenticate,
     complexController.delete)
-
-router.get('/my-complexes', 
-    authenticate, 
-    complexController.getMyActiveComplexes)
-
-router.get('/my-deleted',
-    authenticate, 
-    complexController.getMyDeletedComplexes)
 
 router.patch('/:id/restore',
     authenticate,

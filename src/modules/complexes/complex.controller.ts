@@ -82,6 +82,18 @@ export class ComplexController {
     })
 
 
+    hardDelete = catchAsync(async (req: Request, res: Response) => {
+        const userData = req.user
+        const id = Number(req.params.id)
+
+        await this.complexService.delete(userData, id)
+
+        res.json({
+            message: "Complejo restaurado correctamente",
+        })
+    })
+
+
     updateStatus = catchAsync(async (req: Request, res: Response) => {
         const userData = req.user
         const id = Number(req.params.id)
