@@ -78,14 +78,20 @@ export class ComplexService {
 
     
     async updateSchedules(id: ComplexId, userData: UserSafe, schedules: ScheduleInput[]) {
-    const complex = await this.complexRepository.findActiveById(id)
+        const complex = await this.complexRepository.findActiveById(id)
 
-    this.getComplexOrThrow(complex, userData)
+        this.getComplexOrThrow(complex, userData)
+        
+        return await this.complexRepository.updateSchedules(complex.id, schedules)
+    }
+
     
-    return await this.complexRepository.updateSchedules(complex.id, schedules)
-}
+    async findByComplex(id: ComplexId) {
+        return await this.complexRepository.findCourtsById(id)
+    }
 
 
+    
     private getComplexOrThrow(complex: Complex | null, user: UserSafe) {
         if(!complex){
             throw new AppError('Complejo no encontrado', 404)

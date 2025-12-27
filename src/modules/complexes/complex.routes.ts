@@ -56,6 +56,10 @@ router.patch('/:id/schedules',
     validateUpdateSchedules, 
     complexController.updateSchedules
 )
+
+router.get('/:id/courts',
+    complexController.getCourts
+)
     
 
     

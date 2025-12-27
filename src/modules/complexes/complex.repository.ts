@@ -109,22 +109,32 @@ export class ComplexRepository {
 
     async updateSchedules(complexId: ComplexId, schedules: ScheduleInput[]) {
     return await db.$transaction(async (tx) => {
-        await tx.complexSchedule.deleteMany({
-            where: { complexId }
-        })
+            await tx.complexSchedule.deleteMany({
+                where: { complexId }
+            })
 
-        const dataToCreate = schedules.map(s => ({
-            ...s,
-            complexId
-        }))
+            const dataToCreate = schedules.map(s => ({
+                ...s,
+                complexId
+            }))
 
-        await tx.complexSchedule.createMany({
-            data: dataToCreate
-        })
+            await tx.complexSchedule.createMany({
+                data: dataToCreate
+            })
 
-        return await tx.complexSchedule.findMany({
-            where: { complexId }
+            return await tx.complexSchedule.findMany({
+                where: { complexId }
+            })
         })
-    })
-}
+    }
+
+    async findCourtsById(complexId: ComplexId) {
+        return await db.court.findMany({
+            where: {
+                complexId,
+                isActive: true, 
+                deletedAt: null
+            }
+        })
+    }
 }

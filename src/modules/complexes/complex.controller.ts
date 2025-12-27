@@ -108,6 +108,15 @@ export class ComplexController {
     })
 
 
+    getCourts = catchAsync(async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
+
+        const courts = await this.complexService.findByComplex(id)
+
+        res.json({ data: courts })
+    })
+
+
     updateSchedules = catchAsync(async (req: Request, res: Response) => {
         const id = Number(req.params.id)
         const userData = req.user
