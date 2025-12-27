@@ -22,7 +22,8 @@ export class CourtRepository {
             where: {
                 id,
                 isActive: true
-            }
+            },
+            include: { complex: true }
         })
     }
 
@@ -31,7 +32,8 @@ export class CourtRepository {
             where: {
                 id,
                 deletedAt: null
-            }
+            },
+            include: { complex: true }
         })
     }
 
@@ -56,7 +58,8 @@ export class CourtRepository {
                 complex: {
                     ownerId: userId
                 }
-            }
+            },
+            include: { complex: true }
         })
     }
 
@@ -67,14 +70,16 @@ export class CourtRepository {
                 complex: {
                     ownerId: userId
                 }
-            }
+            },
+            include: { complex: true }
         })
     }
 
     async findAllCourts() {
         return await db.court.findMany({
             where: { 
-                deletedAt: null
+                deletedAt: null,
+                isActive: true
             } 
         })
     }
@@ -84,7 +89,8 @@ export class CourtRepository {
             where: {
                 id,
                 deletedAt: { not: null }
-            }
+            },
+            include: { complex: true }
         })
     }
 

@@ -15,7 +15,7 @@ export const validateCreateCourt = [
 
     body('price')
         .notEmpty().withMessage('El precio es obligatorio')
-        .isNumeric().withMessage('El precio debe ser un número válido'),
+        .isFloat({min: 0}).withMessage('El precio debe ser un número válido'),
 
     body('duration')
         .optional()
