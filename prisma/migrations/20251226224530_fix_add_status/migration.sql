@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Complex" ADD COLUMN     "status" TEXT NOT NULL DEFAULT 'PENDING';

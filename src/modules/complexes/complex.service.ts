@@ -1,8 +1,8 @@
 import { Complex } from "@prisma/client";
-import { ComplexId, UserSafe } from "../../types";
+import { ComplexId, UserId, UserSafe } from "../../types";
 import { AppError } from "../../utils/appError";
 import { ComplexRepository } from "./complex.repository";
-import { ComplexStatus, CreateComplexDTO, UpdateComplexDTO } from "./complex.types";
+import { ComplexStatus, CreateComplexDTO, ScheduleInput, UpdateComplexDTO } from "./complex.types";
 
 
 export class ComplexService {
@@ -15,7 +15,7 @@ export class ComplexService {
             throw new AppError("Debe tener una cuenta de tipo Dueño para crear un Complejo", 403)
         }
 
-        return await this.complexRepository.create({...data, ownerId: user.id})
+        return await this.complexRepository.create( data, user.id)
     }
 
     async getAllActive() {
@@ -76,6 +76,14 @@ export class ComplexService {
         return await this.complexRepository.update(id, {status})
     }
 
+    
+    async updateSchedules(id: ComplexId, userData: UserSafe, schedules: ScheduleInput[]) {
+    const complex = await this.complexRepository.findActiveById(id)
+
+    this.getComplexOrThrow(complex, userData)
+    
+    return await this.complexRepository.updateSchedules(complex.id, schedules)
+}
 
 
     private getComplexOrThrow(complex: Complex | null, user: UserSafe) {

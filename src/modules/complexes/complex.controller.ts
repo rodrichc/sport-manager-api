@@ -106,4 +106,18 @@ export class ComplexController {
             complex
         })
     })
+
+
+    updateSchedules = catchAsync(async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
+        const userData = req.user
+        const schedules = req.body.schedules
+
+        const complex = await this.complexService.updateSchedules(id, userData, schedules)
+
+        res.json({
+            message: "Horarios actualizados correctamente.",
+            complex
+        })
+    })
 }

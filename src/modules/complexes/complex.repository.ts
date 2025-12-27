@@ -1,12 +1,24 @@
 import { db } from "../../config/db"
 import { ComplexId, UserId } from "../../types"
-import { CreateComplexDTO, DeleteComplexDTO, UpdateComplexDTO } from "./complex.types"
+import { CreateComplexDTO, DeleteComplexDTO, ScheduleInput, UpdateComplexDTO } from "./complex.types"
 
 export class ComplexRepository {
 
-    async create(data: CreateComplexDTO) {
+    async create(data: CreateComplexDTO, ownerId: UserId) {
+        const { schedules, ...complexData } = data
+
         return await db.complex.create({
-            data
+            data: {
+                ...complexData,
+                ownerId,
+                
+                schedules: {
+                    create: schedules
+                }
+            },
+            include: {
+                schedules: true
+            }
         })
     }
 
@@ -23,6 +35,10 @@ export class ComplexRepository {
         return await db.complex.findUnique({
             where: {
                 id
+            },
+            include: {
+                schedules: true, 
+                courts: true     
             }
         })
     }
@@ -32,6 +48,10 @@ export class ComplexRepository {
             where: {
                 id,
                 deletedAt: null
+            },
+            include: {
+                schedules: true, 
+                courts: true     
             }
         })
     }
@@ -52,19 +72,23 @@ export class ComplexRepository {
         })
     }
 
-    async findActiveByOwner(id: UserId){
+    async findActiveByOwner(userId: UserId){
         return await db.complex.findMany({
             where: {
-                id,
+                ownerId: userId,
                 deletedAt: null
+            },
+            include: {
+                schedules: true  
             }
+            
         })
     }
 
-    async findDeletedByOwner(id: UserId){
+    async findDeletedByOwner(userId: UserId){
         return await db.complex.findMany({
             where: {
-                id,
+                ownerId: userId,
                 deletedAt: {not: null}
             }
         })
@@ -82,4 +106,25 @@ export class ComplexRepository {
             where: { id }
         })
     }
+
+    async updateSchedules(complexId: ComplexId, schedules: ScheduleInput[]) {
+    return await db.$transaction(async (tx) => {
+        await tx.complexSchedule.deleteMany({
+            where: { complexId }
+        })
+
+        const dataToCreate = schedules.map(s => ({
+            ...s,
+            complexId
+        }))
+
+        await tx.complexSchedule.createMany({
+            data: dataToCreate
+        })
+
+        return await tx.complexSchedule.findMany({
+            where: { complexId }
+        })
+    })
+}
 }

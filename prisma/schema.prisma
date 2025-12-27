@@ -26,11 +26,12 @@ model Complex {
   address     String
   lat         Float?    //  (Ex: -34.6037)
   lng         Float?    //  (Ex: -58.3816) 
-  logo        String?  
-  openTime    String   
-  closeTime   String   
-  status      String   @default("PENDING")
+  logo        String?    
+
+  schedules   ComplexSchedule[]
   
+  status      String   @default("PENDING")     
+
   ownerId     Int
   owner       User     @relation(fields: [ownerId], references: [id])
 
@@ -39,6 +40,18 @@ model Complex {
   deletedAt   DateTime?
   
   courts      Court[] 
+}
+
+model ComplexSchedule {
+  id        Int    @id @default(autoincrement())
+  dayOfWeek Int    
+  startTime String    // "HH:MM"
+  endTime   String    // "HH:MM"
+  
+  complexId Int
+  complex   Complex @relation(fields: [complexId], references: [id], onDelete: Cascade) 
+
+  @@index([complexId, dayOfWeek]) 
 }
 
 model Court {
@@ -54,7 +67,7 @@ model Court {
   isActive    Boolean  @default(true)
 
   complexId   Int
-  complex     Complex  @relation(fields: [complexId], references: [id])
+  complex     Complex  @relation(fields: [complexId], references: [id], onDelete: Cascade)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt 

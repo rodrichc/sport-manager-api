@@ -3,6 +3,22 @@ import { handleInputErrors } from '../../middleware/validation'
 import { validateId } from '../../validators/common'
 
 
+const timeFormat = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+
+const validateShedules = [
+    body('schedules')
+        .exists().withMessage('Debes definir los horarios')
+        .isArray({ min: 1 }).withMessage('Debes enviar al menos un horario de atención'),
+    body('schedules.*.dayOfWeek')
+        .isInt({ min: 0, max: 6 }).withMessage('Día inválido. Debe ser entre 0 (Dom) y 6 (Sab)'),
+    body('schedules.*.startTime')
+        .matches(timeFormat).withMessage('Hora de inicio inválida. Formato requerido: HH:MM')
+        .notEmpty().withMessage('La hora de inicio es obligatoria'),
+    body('schedules.*.endTime')
+        .matches(timeFormat).withMessage('Hora de fin inválida. Formato requerido: HH:MM')
+        .notEmpty().withMessage('La hora de fin es obligatoria'),
+]
+
 export const validateCreateComplex = [
     body('name')
         .notEmpty()
@@ -10,18 +26,16 @@ export const validateCreateComplex = [
     body('address')
         .notEmpty()
         .withMessage('La dirección es obligatoria'),
-    body('openTime')
-        .notEmpty()
-        .withMessage('Hora de apertura obligatoria')
-        .matches(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)
-        .withMessage('Formato inválido (HH:MM)'),
-    body('closeTime')
-        .notEmpty()
-        .withMessage('Hora de cierre obligatoria')
-        .matches(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)
-        .withMessage('Formato inválido (HH:MM)'),
+
+    ...validateShedules,
     
     handleInputErrors 
+]
+
+
+export const validateUpdateSchedules = [
+    ...validateShedules,
+    handleInputErrors
 ]
 
 
