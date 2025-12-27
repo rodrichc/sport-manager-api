@@ -1,28 +1,38 @@
 # 🏟️ SportManager API (SaaS)
 
-> **🚧 ESTADO DEL PROYECTO: EN DESARROLLO ACTIVO (MVP)**
-> Código en construcción.
-> * **Foco actual:** Implementación del módulo de Canchas (Filtros y Geolocalización).
-> * **Próximos pasos:** Lógica de reservas y disponibilidad horaria.
+> MVP funcional en desarrollo activo — core features implementadas. * **Próximos pasos:** Lógica de reservas y disponibilidad horaria.
 
 ---
 
 ## 📖 Descripción
 
-**SportManager** es una plataforma SaaS (Software as a Service) diseñada para la gestión integral de complejos deportivos. Permite a los dueños administrar múltiples sucursales, canchas y servicios, y a los jugadores buscar y reservar turnos en tiempo real.
+**SportManager** es una API REST para la gestión de complejos deportivos. Permite a los dueños administrar sucursales y canchas, y a los usuarios consultar disponibilidad y gestionar reservas de forma centralizada.
 
-El proyecto está construido con un enfoque en **Arquitectura Limpia (Clean Architecture)**, escalabilidad y seguridad.
+El objetivo del proyecto es resolver la organización operativa de complejos deportivos a través de una plataforma simple, escalable y segura.
+
+---
+
+## 🌟 Funcionalidades
+
+- Registro y autenticación de usuarios (JWT)
+- Gestión de complejos y sucursales por dueño
+- CRUD de canchas con control de permisos
+- Soft delete y restauración de recursos
+- Validaciones y manejo centralizado de errores
+- Filtros dinámicos por tipo de cancha y atributos
+
+---
 
 ## 🛠️ Tech Stack
 
-* **Runtime:** Node.js
-* **Lenguaje:** TypeScript
-* **Framework:** Express.js
-* **Base de Datos:** PostgreSQL
-* **ORM:** Prisma
-* **Arquitectura:** Layered Pattern (Controller - Service - Repository)
-* **Seguridad:** JWT (Auth), Bcrypt (Hashing), CORS
-* **Validaciones:** Express-Validator
+- Node.js
+- TypeScript
+- Express.js
+- PostgreSQL
+- Prisma ORM
+- JWT (Auth)
+- Express-Validator
+- Arquitectura en capas (Controller / Service / Repository)
 
 ---
 
@@ -32,45 +42,20 @@ El sistema sigue una arquitectura modular en capas para asegurar la separación 
 
 ```text
 src/
-├── config/           # Configuración de DB y entorno
-├── middlewares/      # Auth, Error Handling, Validations
-├── modules/          # Módulos de negocio
-│   ├── auth/         # Lógica de registro y login
-│   ├── complex/      # Gestión de complejos/sucursales
-│   └── courts/       # Gestión de canchas y filtros
-├── types/            # Definiciones de tipos globales
+├── config/           # Configuración de entorno y DB
+├── middlewares/      # Auth, validaciones y manejo de errores
+├── modules/          # Módulos de negocio (auth, complex, courts)
+├── types/            # Tipos y DTOs globales
 └── utils/            # Helpers y utilidades
 ```
 
 ---
 
-### 🌟 Features Técnicas Destacadas
-* **Clean Architecture:** Lógica de negocio aislada en Servicios y acceso a datos en Repositorios.
-* **Soft Delete:** Implementación de borrado lógico para preservar integridad de datos.
-* **Type Safety:** Uso de Interfaces y DTOs para evitar errores en tiempo de ejecución.
-* **Advanced Filtering:** Endpoints con capacidad de filtrado dinámico (por deporte, techado/descubierto).
-
----
-
-## 🧠 Modelo de Negocio
-
-La lógica se basa en una jerarquía relacional:
-
-1.  **OWNER (Dueño):** Crea y administra sus complejos.
-2.  **COMPLEX (Sucursal):** Posee ubicación y servicios.
-3.  **COURT (Cancha):** El recurso reservable con atributos específicos (Superficie, Precio).
-4.  **BOOKING (Reserva):** La transacción final que bloquea disponibilidad.
-
----
-
 ## 🚀 Estado del Proyecto y Próximos Pasos
 
-Actualmente el sistema cuenta con los módulos de **Autenticación (Auth)**, **Usuarios** y **Gestión de Complejos** (Sucursales) totalmente funcionales.
-
-El desarrollo se encuentra **activo hoy mismo** en la finalización del **Módulo de Canchas**, trabajando específicamente en:
 1.  Lógica de filtrado avanzado (por deporte, superficie, techado).
-2.  Algoritmo de búsqueda por Geolocalización (Canchas cercanas).
-3.  Próximamente: Implementación del motor de reservas (Bookings).
+2.  Búsqueda por Geolocalización (Canchas cercanas).
+3.  Implementación del motor de reservas (Bookings).
 
 ---
 
@@ -111,3 +96,16 @@ El desarrollo se encuentra **activo hoy mismo** en la finalización del **Módul
 En la carpeta `/postman` encontrarás la colección completa para importar.
 
 > **💡 Tip:** El endpoint de Login guarda automáticamente el token en las variables de entorno de Postman. Logueate y probá los endpoints.
+
+
+---
+
+
+## 👤 Autor
+
+**Rodrigo Chávez**  
+Backend Developer (Node.js · TypeScript · Express)  
+
+- GitHub: https://github.com/rodrichc  
+- LinkedIn: https://www.linkedin.com/in/rodrigo-chavez2/
+
