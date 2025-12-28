@@ -16,7 +16,9 @@ model User {
   role        String  @default("USER")
   confirmed   Boolean @default(false)
   phoneNumber String?
+
   complexes   Complex[]
+  bookings    Booking[]
 }
 
 model Complex {
@@ -38,6 +40,9 @@ model Complex {
   createdAt   DateTime @default(now())  
   updatedAt   DateTime @updatedAt       
   deletedAt   DateTime?
+
+  minBookingDuration Int @default(60)  
+  maxBookingDuration Int @default(180)
   
   courts      Court[] 
 }
@@ -68,8 +73,38 @@ model Court {
 
   complexId   Int
   complex     Complex  @relation(fields: [complexId], references: [id], onDelete: Cascade)
+
+  bookings    Booking[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt 
   deletedAt   DateTime?           
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  
+  courtId     Int
+  court       Court    @relation(fields: [courtId], references: [id])
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+
+  startTime   DateTime
+  endTime     DateTime
+  
+  totalPrice  Decimal  @db.Decimal(10, 2)
+  status      BookingStatus @default(CONFIRMED)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courtId, startTime, endTime])
 }
