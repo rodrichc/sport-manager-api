@@ -14,7 +14,7 @@ router.post('/',
 router.get('/', courtController.getAll)
 
 router.get('/my-courts', authenticate, courtController.getUserCourts)
-router.get('/deleted', authenticate, courtController.getDeletedUserCourts)
+router.get('/my-deleted', authenticate, courtController.getDeletedUserCourts)
 
 router.patch('/:id/restore', authenticate, validateId, courtController.restore)
 router.delete('/:id/force', authenticate, validateId, courtController.hardDelete)

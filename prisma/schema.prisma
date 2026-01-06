@@ -92,7 +92,7 @@ model Booking {
   id          Int      @id @default(autoincrement())
   
   courtId     Int
-  court       Court    @relation(fields: [courtId], references: [id])
+  court       Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
   
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
