@@ -1,6 +1,6 @@
 # 🏟️ SportManager API (SaaS)
 
-> MVP funcional en desarrollo activo — core features implementadas. * **Próximos pasos:** Testing y Swagger.
+> MVP funcional en desarrollo activo — core features implementadas. **Próximos pasos:** Testing y Swagger.
 
 ---
 
@@ -19,7 +19,7 @@ El objetivo del proyecto es resolver la organización operativa de complejos dep
 - CRUD de canchas con control de permisos
 - Soft delete y restauración de recursos
 - Validaciones y manejo centralizado de errores
-- Filtros dinámicos por tipo de cancha y atributos 
+- Filtros dinámicos por tipo de cancha y atributos (*Próximamente*)
 
 ---
 
@@ -53,9 +53,9 @@ src/
 
 ## 🚀 Estado del Proyecto y Próximos Pasos
 
-1.  Lógica de filtrado avanzado (por deporte, superficie, techado).
-2.  Búsqueda por Geolocalización (Canchas cercanas).
-3.  Implementación del motor de reservas (Bookings).
+1.  Testing y documentación (Jest y Swagger)
+2.  Lógica de filtrado avanzado (por deporte, superficie, techado).
+3.  Búsqueda por Geolocalización (Canchas cercanas).
 
 ---
 
