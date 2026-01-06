@@ -1,6 +1,6 @@
 # 🏟️ SportManager API (SaaS)
 
-> MVP funcional en desarrollo activo — core features implementadas. * **Próximos pasos:** Lógica de reservas y disponibilidad horaria.
+> MVP funcional en desarrollo activo — core features implementadas. * **Próximos pasos:** Testing y Swagger.
 
 ---
 
@@ -19,7 +19,7 @@ El objetivo del proyecto es resolver la organización operativa de complejos dep
 - CRUD de canchas con control de permisos
 - Soft delete y restauración de recursos
 - Validaciones y manejo centralizado de errores
-- Filtros dinámicos por tipo de cancha y atributos
+- Filtros dinámicos por tipo de cancha y atributos 
 
 ---
 
@@ -103,7 +103,7 @@ En la carpeta `/postman` encontrarás la colección completa para importar.
 
 ## 👤 Autor
 
-**Rodrigo Chávez**  
+**Rodrigo Chavez**  
 Backend Developer (Node.js · TypeScript · Express)  
 
 - GitHub: https://github.com/rodrichc  
