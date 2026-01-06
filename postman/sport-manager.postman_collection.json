@@ -235,7 +235,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Complejo Padel\",\r\n    \"address\": \"Av. San Martin 0, Córdoba\",\r\n    \"openTime\": \"14:30\",\r\n    \"closeTime\": \"02:00\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Complejo Padel\",\r\n    \"address\": \"Av. San Martin 0, Córdoba\",\r\n    \"schedules\": [\r\n                    {\"dayOfWeek\": 0, \"startTime\": \"12:00\", \"endTime\": \"02:00\"}\r\n                ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -243,13 +243,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/complexes/create",
+							"raw": "{{url}}/complexes/",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"complexes",
-								"create"
+								""
 							]
 						}
 					},
@@ -304,6 +304,44 @@
 							"path": [
 								"complexes",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Schedules",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"schedules\": [  \r\n                    {\"dayOfWeek\": 0, \"startTime\": \"12:00\", \"endTime\": \"02:00\"},\r\n                    {\"dayOfWeek\": 1, \"startTime\": \"12:00\", \"endTime\": \"02:00\"},\r\n                    {\"dayOfWeek\": 2, \"startTime\": \"12:00\", \"endTime\": \"02:00\"},\r\n                    {\"dayOfWeek\": 3, \"startTime\": \"12:00\", \"endTime\": \"02:00\"},\r\n                    {\"dayOfWeek\": 4, \"startTime\": \"12:00\", \"endTime\": \"02:00\"},\r\n                    {\"dayOfWeek\": 5, \"startTime\": \"12:00\", \"endTime\": \"02:00\"},\r\n                    {\"dayOfWeek\": 6, \"startTime\": \"12:00\", \"endTime\": \"02:00\"}\r\n                ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/complexes/1/schedules",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"complexes",
+								"1",
+								"schedules"
 							]
 						}
 					},
@@ -524,6 +562,421 @@
 									"key": "",
 									"value": null,
 									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "COURT",
+			"item": [
+				{
+					"name": "Create Court",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Cancha 1\",\r\n    \"sport\": \"Padel\",\r\n    \"complexId\": 1,\r\n    \"price\": 20000,\r\n    \"duration\": 90\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/courts/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find All Complex",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/courts/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find My Courts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/courts/my-courts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								"my-courts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Nuevo Nombre\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/courts/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/courts/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/courts/1/restore",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								"1",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find My Deleted",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/courts/my-deleted",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								"my-deleted"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hard Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/courts/1/force",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								"1",
+								"force"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/courts/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"courts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BOOKING",
+			"item": [
+				{
+					"name": "CREATE BOOKING",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"courtId\": 1,\r\n    \"startTime\": \"2026-01-10T18:00:00.000Z\",\r\n    \"endTime\": \"2026-01-10T19:30:00.000Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/bookings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TEST COLLISION",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"courtId\": 1,\r\n    \"startTime\": \"2026-01-10T19:00:00.000Z\",\r\n    \"endTime\": \"2026-01-10T20:00:00.000Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/bookings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TEST DURATION",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"courtId\": 1,\r\n    \"startTime\": \"2026-01-10T20:00:00.000Z\",\r\n    \"endTime\": \"2026-01-10T21:15:00.000Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/bookings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET AVAILABILITY",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/bookings/availability?courtId=1&date=2025-12-29",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"bookings",
+								"availability"
+							],
+							"query": [
+								{
+									"key": "courtId",
+									"value": "1"
+								},
+								{
+									"key": "date",
+									"value": "2025-12-29"
 								}
 							]
 						}
