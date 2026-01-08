@@ -3,6 +3,8 @@ import server from "./server"
 
 const port = process.env.PORT || 4000
 
-server.listen(port, () => {
-    console.log(colors.blue.bold(`Servidor Funcionando en puerto: ${port}`))
-})
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(port, () => {
+        console.log(colors.blue.bold(`Server running in: ${port}`))
+    })
+}

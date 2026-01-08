@@ -1,10 +1,10 @@
-import slug from "slug"
 import { AuthRepository } from "./auth.repository"
 import { CreateAccountDTO, LoginDTO, UserPhoneNumber } from "./auth.types"
 import { checkPassword, hashPassword } from "../../utils/auth"
 import { AppError } from "../../utils/appError"
 import { generateJWT } from "../../utils/jwt"
 import { UserSafe } from "../../types"
+import { createUsername } from "../../utils/slugify"
 
 
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
         }
 
 
-        const username = slug(data.username, '')
+        const username = createUsername(data.username)
         const usernameExist = await this.authRepository.findUserForUsername(username)
 
         if(usernameExist){
