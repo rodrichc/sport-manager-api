@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { AuthService } from "./auth.service"
 import { CreateAccountDTO, LoginDTO } from "./auth.types"
 import { catchAsync } from "../../utils/catchAsync"
+import { UserSafe } from "../../types"
 
 export class AuthController {
 
@@ -10,7 +11,7 @@ export class AuthController {
     createAccount = catchAsync(async (req: Request, res: Response) => {
         const userData: CreateAccountDTO = req.body
 
-        const newUser = await this.authService.createAccount(userData)
+        const newUser: UserSafe = await this.authService.createAccount(userData)
 
         res.status(201).json({
             message: 'Usuario creado correctamente',

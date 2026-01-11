@@ -37,7 +37,7 @@ export class AuthService {
 
         const hashedPassword = await hashPassword(password)
 
-        return await this.authRepository.createUser({
+        const newUser = await this.authRepository.createUser({
             name,
             email,
             password: hashedPassword,
@@ -45,6 +45,14 @@ export class AuthService {
             role,
             phoneNumber
         })
+
+        return {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            username: newUser.username,
+            role: newUser.role,
+        } 
     }
 
 
