@@ -1,6 +1,6 @@
 # 🏟️ SportManager API (SaaS)
 
-> MVP funcional en desarrollo activo — core features implementadas. **Próximos pasos:** Testing y Swagger.
+> **Deploy Activo:** [Ver Documentación Swagger UI | *EN PROCESO*](https://sport-manager-api-c9y9.onrender.com/api-docs) 
 
 ---
 
@@ -33,6 +33,7 @@ El objetivo del proyecto es resolver la organización operativa de complejos dep
 - JWT (Auth)
 - Express-Validator
 - Arquitectura en capas (Controller / Service / Repository)
+- Swagger (docs)
 
 ---
 
@@ -91,11 +92,17 @@ src/
 
 ---
 
-## 🧪 Testing con Postman
+## 🧪 Testing
 
+**Swagger UI** - En proceso
+[Proba la API desde acá](https://sport-manager-api-c9y9.onrender.com/api-docs) 
+
+
+
+**Postman**
 En la carpeta `/postman` encontrarás la colección completa para importar.
 
-> **💡 Tip:** El endpoint de Login guarda automáticamente el token en las variables de entorno de Postman. Logueate y probá los endpoints.
+> **Detalle:** El endpoint de Login guarda automáticamente el token en las variables de entorno de Postman.
 
 
 ---
