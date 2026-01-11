@@ -33,7 +33,7 @@
     "@types/express": "^5.0.5",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.0.6",
+    "@types/node": "^20.11.30",
     "@types/slug": "^5.0.9",
     "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6.0.4",
