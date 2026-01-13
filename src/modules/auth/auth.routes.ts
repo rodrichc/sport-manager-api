@@ -59,7 +59,7 @@ const router = Router()
  *                     role:
  *                       type: string
  *       400:
- *         description: Datos inválidos o faltantes
+ *         description: Datos inválidos o faltantes 
  *       409:
  *         description: El email o username ya está registrado
  */
@@ -96,6 +96,12 @@ router.post('/register',
  *               properties:
  *                 token:
  *                   type: string
+ *       400:
+ *         description: Datos inválidos o faltantes 
+ *       403:
+ *         description: Contraseña incorrecta
+ *       404:
+ *         description: Usuario no existe 
  */
 
 router.post('/login', 
