@@ -6,8 +6,8 @@ import { CreateComplexDTO, UpdateComplexDTO } from "./complex.types"
 
 export class ComplexController {
 
-    constructor(private readonly complexService: ComplexService) {}
-    
+    constructor(private readonly complexService: ComplexService) { }
+
     create = catchAsync(async (req: Request, res: Response) => {
         const complexData: CreateComplexDTO = req.body
         const userData = req.user
@@ -18,25 +18,25 @@ export class ComplexController {
             message: "Complejo creado correctamente.",
             newComplex
         })
-    }) 
+    })
 
-    
+
     getAll = catchAsync(async (req: Request, res: Response) => {
         const complexes = await this.complexService.getAllActive()
 
         res.json(complexes)
     })
-    
-    
+
+
     update = catchAsync(async (req: Request, res: Response) => {
         const updateComplexData: UpdateComplexDTO = req.body
         const userData = req.user
-        const id = Number(req.params.id) 
+        const id = Number(req.params.id)
 
         const updatedComplex = await this.complexService.update(updateComplexData, userData, id)
 
         res.json(updatedComplex)
-    }) 
+    })
 
 
     delete = catchAsync(async (req: Request, res: Response) => {
@@ -86,10 +86,10 @@ export class ComplexController {
         const userData = req.user
         const id = Number(req.params.id)
 
-        await this.complexService.delete(userData, id)
+        await this.complexService.hardDelete(userData, id)
 
         res.json({
-            message: "Complejo restaurado correctamente",
+            message: "Complejo eliminado permanentemente",
         })
     })
 
