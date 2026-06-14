@@ -9,4 +9,18 @@ module.exports = {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  transform: {
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          types: ['node', 'jest'],
+          isolatedModules: true,
+        },
+        diagnostics: {
+          ignoreCodes: [151002],
+        },
+      },
+    ],
+  },
 };
