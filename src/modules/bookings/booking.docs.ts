@@ -146,3 +146,67 @@
  *                   type: string
  *                   example: La cancha ya fue reservada por otro usuario dentro de ese horario
  */
+
+/**
+ * @swagger
+ * /bookings/my-bookings:
+ *   get:
+ *     summary: Obtener historial de reservas
+ *     description: >
+ *       Lista todas las reservas realizadas por el usuario autenticado, ordenadas
+ *       por fecha de inicio de manera descendente (las más recientes primero).
+ *       Incluye información detallada de la cancha y el complejo deportivo.
+ *     tags:
+ *       - Bookings
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Historial de reservas obtenido con éxito (puede estar vacío)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     allOf:
+ *                       - $ref: '#/components/schemas/BookingResponse'
+ *                       - type: object
+ *                         properties:
+ *                           court:
+ *                             type: object
+ *                             properties:
+ *                               id:
+ *                                 type: integer
+ *                                 example: 1
+ *                               name:
+ *                                 type: string
+ *                                 example: Cancha 1
+ *                               sport:
+ *                                 type: string
+ *                                 example: fútbol 5
+ *                               complex:
+ *                                 type: object
+ *                                 properties:
+ *                                   id:
+ *                                     type: integer
+ *                                     example: 1
+ *                                   name:
+ *                                     type: string
+ *                                     example: Complejo El Trébol
+ *       401:
+ *         description: No autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Token ausente o inválido
+ */

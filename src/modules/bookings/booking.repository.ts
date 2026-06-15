@@ -76,4 +76,20 @@ export class BookingRepository {
         }
     });
 }
+
+    async findByUserId(userId: UserId) {
+        return await db.booking.findMany({
+            where: { userId },
+            include: {
+                court: {
+                    include: {
+                        complex: true
+                    }
+                }
+            },
+            orderBy: {
+                startTime: 'desc'
+            }
+        })
+    }
 }

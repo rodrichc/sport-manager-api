@@ -194,4 +194,54 @@ describe('Booking API Integration', () => {
 
     expect(response.status).toBe(400); 
 })
+    it('GET /bookings/my-bookings - Should return 401 if not authenticated', async () => {
+        const response = await request(app).get('/api/v1/bookings/my-bookings')
+        expect(response.status).toBe(401)
+    })
+
+    it('GET /bookings/my-bookings - Should return user bookings ordered by startTime descending and include court/complex', async () => {
+        // Create a second booking to test ordering
+        const secondStart = addDays(new Date(TEST_START), 7).toISOString()
+        const secondEnd = addDays(new Date(TEST_END), 7).toISOString()
+        
+        await request(app)
+            .post('/api/v1/bookings')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                courtId: courtId,
+                startTime: secondStart,
+                endTime: secondEnd,
+            });
+
+        const response = await request(app)
+            .get('/api/v1/bookings/my-bookings')
+            .set('Authorization', `Bearer ${token}`)
+
+        expect(response.status).toBe(200)
+        expect(Array.isArray(response.body.data)).toBe(true)
+        expect(response.body.data.length).toBeGreaterThanOrEqual(2)
+
+        // Verify descending order
+        const time1 = new Date(response.body.data[0].startTime).getTime()
+        const time2 = new Date(response.body.data[1].startTime).getTime()
+        expect(time1).toBeGreaterThan(time2)
+
+        // Verify includes
+        const booking = response.body.data[0]
+        expect(booking).toHaveProperty('court')
+        expect(booking.court).toHaveProperty('id', courtId)
+        expect(booking.court).toHaveProperty('complex')
+        expect(booking.court.complex).toHaveProperty('id', complexId)
+    })
+
+    it('GET /bookings/my-bookings - Should return empty array if user has no bookings', async () => {
+        const ownerToken = generateJWT({id: ownerId})
+        const response = await request(app)
+            .get('/api/v1/bookings/my-bookings')
+            .set('Authorization', `Bearer ${ownerToken}`)
+
+        expect(response.status).toBe(200)
+        expect(Array.isArray(response.body.data)).toBe(true)
+        expect(response.body.data.length).toBe(0)
+    })
 })

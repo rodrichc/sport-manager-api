@@ -11,6 +11,11 @@ router.post('/',
     bookingController.create
 )
 
+router.get('/my-bookings',
+    authenticate,
+    bookingController.getMyBookings
+)
+
 router.get('/availability',
     authenticate,
     validateGetAvailability,

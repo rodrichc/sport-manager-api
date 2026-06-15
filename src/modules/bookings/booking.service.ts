@@ -191,4 +191,8 @@ export class BookingService {
 
         return finalSlots
     }
+
+    async getMyBookings(userId: UserId) {
+        return await this.bookingRepository.findByUserId(userId)
+    }
 }

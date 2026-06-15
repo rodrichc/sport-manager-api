@@ -30,4 +30,12 @@ export class BookingController {
 
         return res.status(200).json(availability);
     })
+
+    getMyBookings = catchAsync(async (req: Request, res: Response) => {
+        const userId: UserId = req.user.id
+
+        const bookings = await this.bookingService.getMyBookings(userId)
+
+        res.status(200).json({ data: bookings })
+    })
 }
