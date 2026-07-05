@@ -6,7 +6,7 @@ import { UserId } from "../../types"
 
 export class BookingController {
 
-    constructor(private readonly bookingService: BookingService) {}
+    constructor(private readonly bookingService: BookingService) { }
 
     create = catchAsync(async (req: Request, res: Response) => {
         const userId: UserId = req.user.id
@@ -24,7 +24,7 @@ export class BookingController {
         const { courtId, date } = req.query;
 
         const availability = await this.bookingService.getAvailability(
-            Number(courtId), 
+            Number(courtId),
             String(date)
         );
 
@@ -34,8 +34,10 @@ export class BookingController {
     getMyBookings = catchAsync(async (req: Request, res: Response) => {
         const userId: UserId = req.user.id
 
-        const bookings = await this.bookingService.getMyBookings(userId)
+        const result = req.pagination
+            ? await this.bookingService.getMyBookings(userId, req.pagination)
+            : { data: await this.bookingService.getMyBookings(userId) }
 
-        res.status(200).json({ data: bookings })
+        res.status(200).json(result)
     })
 }

@@ -14,6 +14,7 @@ jest.mock('../../../config/db', () => ({
             findFirst: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
+            count: jest.fn(),
         },
         complexSchedule: {
             deleteMany: jest.fn(),
@@ -22,6 +23,7 @@ jest.mock('../../../config/db', () => ({
         },
         court: {
             findMany: jest.fn(),
+            count: jest.fn(),
         },
     },
 }))
@@ -347,6 +349,70 @@ describe('ComplexRepository', () => {
                 where: { complexId: 1, isActive: true, deletedAt: null },
             })
             expect(result).toEqual(fakeCourts)
+        })
+    })
+
+
+    // ═════════════════════════════════════════════════════════
+    //  Pagination (findAllActive con paginación)
+    // ═════════════════════════════════════════════════════════
+    describe('findAllActive() con paginación', () => {
+
+        it('debe retornar items paginados y total usando count', async () => {
+            const paginatedCourts = [FAKE_COMPLEX];
+            (mockComplex.findMany as jest.Mock).mockResolvedValue(paginatedCourts)
+            ;(mockComplex.count as jest.Mock).mockResolvedValue(20)
+
+            const result = await repository.findAllActive({ skip: 0, take: 10 })
+
+            expect(mockComplex.findMany).toHaveBeenCalledWith({
+                where: { status: 'APPROVED', deletedAt: null },
+                skip: 0,
+                take: 10,
+            })
+            expect(mockComplex.count).toHaveBeenCalledWith({
+                where: { status: 'APPROVED', deletedAt: null },
+            })
+            expect(result).toEqual({ items: paginatedCourts, total: 20 })
+        })
+    })
+
+    describe('findActiveByOwner() con paginación', () => {
+
+        it('debe retornar items paginados y total', async () => {
+            const paginated = [FAKE_COMPLEX];
+            (mockComplex.findMany as jest.Mock).mockResolvedValue(paginated)
+            ;(mockComplex.count as jest.Mock).mockResolvedValue(5)
+
+            const result = await repository.findActiveByOwner(10, { skip: 0, take: 10 })
+
+            expect(mockComplex.findMany).toHaveBeenCalledWith({
+                where: { ownerId: 10, deletedAt: null },
+                skip: 0,
+                take: 10,
+                include: { schedules: true },
+            })
+            expect(result).toEqual({ items: paginated, total: 5 })
+        })
+    })
+
+    describe('findCourtsById() con paginación', () => {
+
+        it('debe retornar canchas paginadas y total', async () => {
+            const fakeCourts = [
+                { id: 1, name: 'Cancha 1', complexId: 1, isActive: true, deletedAt: null },
+            ];
+            (mockCourt.findMany as jest.Mock).mockResolvedValue(fakeCourts)
+            ;(mockCourt.count as jest.Mock).mockResolvedValue(3)
+
+            const result = await repository.findCourtsById(1, { skip: 0, take: 10 })
+
+            expect(mockCourt.findMany).toHaveBeenCalledWith({
+                where: { complexId: 1, isActive: true, deletedAt: null },
+                skip: 0,
+                take: 10,
+            })
+            expect(result).toEqual({ items: fakeCourts, total: 3 })
         })
     })
 })

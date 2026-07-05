@@ -1,5 +1,7 @@
+import { Complex, Court } from "@prisma/client"
 import { db } from "../../config/db"
 import { ComplexId, UserId } from "../../types"
+import type { PaginatedResult } from "../../types/pagination"
 import { CreateComplexDTO, DeleteComplexDTO, ScheduleInput, UpdateComplexDTO } from "./complex.types"
 
 export class ComplexRepository {
@@ -11,7 +13,7 @@ export class ComplexRepository {
             data: {
                 ...complexData,
                 ownerId,
-                
+
                 schedules: {
                     create: schedules
                 }
@@ -22,13 +24,23 @@ export class ComplexRepository {
         })
     }
 
-    async findAllActive() {
-        return await db.complex.findMany({
-            where: {
-                status: 'APPROVED',
-                deletedAt: null
-            }
-        })
+    async findAllActive(): Promise<Complex[]>
+    async findAllActive(pagination: { skip: number; take: number }): Promise<PaginatedResult<Complex>>
+    async findAllActive(pagination?: { skip: number; take: number }) {
+        const where = {
+            status: 'APPROVED',
+            deletedAt: null
+        }
+
+        if (pagination) {
+            const [items, total] = await Promise.all([
+                db.complex.findMany({ where, skip: pagination.skip, take: pagination.take }),
+                db.complex.count({ where })
+            ])
+            return { items, total }
+        }
+
+        return await db.complex.findMany({ where })
     }
 
     async findById(id: ComplexId) {
@@ -37,21 +49,21 @@ export class ComplexRepository {
                 id
             },
             include: {
-                schedules: true, 
-                courts: true     
+                schedules: true,
+                courts: true
             }
         })
     }
-    
-    async findActiveById(id: ComplexId){
+
+    async findActiveById(id: ComplexId) {
         return await db.complex.findFirst({
             where: {
                 id,
                 deletedAt: null
             },
             include: {
-                schedules: true, 
-                courts: true     
+                schedules: true,
+                courts: true
             }
         })
     }
@@ -65,36 +77,62 @@ export class ComplexRepository {
         })
     }
 
-    async softDelete(id: ComplexId, data: DeleteComplexDTO){
+    async softDelete(id: ComplexId, data: DeleteComplexDTO) {
         return await db.complex.update({
             where: { id },
             data
         })
     }
 
-    async findActiveByOwner(userId: UserId){
+    async findActiveByOwner(userId: UserId): Promise<Complex[]>
+    async findActiveByOwner(userId: UserId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Complex>>
+    async findActiveByOwner(userId: UserId, pagination?: { skip: number; take: number }) {
+        const where = {
+            ownerId: userId,
+            deletedAt: null
+        }
+
+        if (pagination) {
+            const [items, total] = await Promise.all([
+                db.complex.findMany({
+                    where,
+                    skip: pagination.skip,
+                    take: pagination.take,
+                    include: { schedules: true }
+                }),
+                db.complex.count({ where })
+            ])
+            return { items, total }
+        }
+
         return await db.complex.findMany({
-            where: {
-                ownerId: userId,
-                deletedAt: null
-            },
+            where,
             include: {
-                schedules: true  
-            }
-            
-        })
-    }
-
-    async findDeletedByOwner(userId: UserId){
-        return await db.complex.findMany({
-            where: {
-                ownerId: userId,
-                deletedAt: {not: null}
+                schedules: true
             }
         })
     }
 
-    async restore(id: ComplexId){
+    async findDeletedByOwner(userId: UserId): Promise<Complex[]>
+    async findDeletedByOwner(userId: UserId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Complex>>
+    async findDeletedByOwner(userId: UserId, pagination?: { skip: number; take: number }) {
+        const where = {
+            ownerId: userId,
+            deletedAt: { not: null }
+        }
+
+        if (pagination) {
+            const [items, total] = await Promise.all([
+                db.complex.findMany({ where, skip: pagination.skip, take: pagination.take }),
+                db.complex.count({ where })
+            ])
+            return { items, total }
+        }
+
+        return await db.complex.findMany({ where })
+    }
+
+    async restore(id: ComplexId) {
         return await db.complex.update({
             where: { id },
             data: { deletedAt: null }
@@ -108,7 +146,7 @@ export class ComplexRepository {
     }
 
     async updateSchedules(complexId: ComplexId, schedules: ScheduleInput[]) {
-    return await db.$transaction(async (tx) => {
+        return await db.$transaction(async (tx) => {
             await tx.complexSchedule.deleteMany({
                 where: { complexId }
             })
@@ -128,13 +166,23 @@ export class ComplexRepository {
         })
     }
 
-    async findCourtsById(complexId: ComplexId) {
-        return await db.court.findMany({
-            where: {
-                complexId,
-                isActive: true, 
-                deletedAt: null
-            }
-        })
+    async findCourtsById(complexId: ComplexId): Promise<Court[]>
+    async findCourtsById(complexId: ComplexId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Court>>
+    async findCourtsById(complexId: ComplexId, pagination?: { skip: number; take: number }) {
+        const where = {
+            complexId,
+            isActive: true,
+            deletedAt: null
+        }
+
+        if (pagination) {
+            const [items, total] = await Promise.all([
+                db.court.findMany({ where, skip: pagination.skip, take: pagination.take }),
+                db.court.count({ where })
+            ])
+            return { items, total }
+        }
+
+        return await db.court.findMany({ where })
     }
 }

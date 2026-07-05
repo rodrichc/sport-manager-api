@@ -31,7 +31,7 @@ model Complex {
   logo        String?    
 
   schedules   ComplexSchedule[]
-  
+   
   status      String   @default("PENDING")     
 
   ownerId     Int
@@ -45,6 +45,9 @@ model Complex {
   maxBookingDuration Int @default(180)
   
   courts      Court[] 
+
+  @@index([status, deletedAt])
+  @@index([ownerId, deletedAt])
 }
 
 model ComplexSchedule {
@@ -79,6 +82,9 @@ model Court {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt 
   deletedAt   DateTime?           
+
+  @@index([complexId, isActive, deletedAt])
+  @@index([isActive, deletedAt])
 }
 
 enum BookingStatus {
@@ -107,4 +113,5 @@ model Booking {
   updatedAt   DateTime @updatedAt
 
   @@index([courtId, startTime, endTime])
+  @@index([userId])
 }

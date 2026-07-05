@@ -5,17 +5,17 @@ import { catchAsync } from "../../utils/catchAsync"
 
 export class CourtController {
 
-    constructor(private readonly courtService: CourtService) {}
+    constructor(private readonly courtService: CourtService) { }
 
     create = catchAsync(async (req: Request, res: Response) => {
         const userId = req.user.id
         const courtData: CourtDTO = req.body
 
         const newCourt = await this.courtService.create(userId, courtData)
-        
-        res.status(201).json({ 
-            message: 'Cancha creada con éxito', 
-            data: newCourt 
+
+        res.status(201).json({
+            message: 'Cancha creada con éxito',
+            data: newCourt
         })
     })
 
@@ -49,25 +49,31 @@ export class CourtController {
     })
 
     getAll = catchAsync(async (req: Request, res: Response) => {
-        const courts = await this.courtService.findAll()
+        const result = req.pagination
+            ? await this.courtService.findAll(req.pagination)
+            : { data: await this.courtService.findAll() }
 
-        res.json({ data: courts })
+        res.json(result)
     })
 
     getUserCourts = catchAsync(async (req: Request, res: Response) => {
         const userId = req.user.id
 
-        const courts = await this.courtService.findCourtsUser(userId)
+        const result = req.pagination
+            ? await this.courtService.findCourtsUser(userId, req.pagination)
+            : { data: await this.courtService.findCourtsUser(userId) }
 
-        res.json({ data: courts })
+        res.json(result)
     })
 
     getDeletedUserCourts = catchAsync(async (req: Request, res: Response) => {
         const userId = req.user.id
 
-        const courts = await this.courtService.findDeletedCourtsUser(userId)
+        const result = req.pagination
+            ? await this.courtService.findDeletedCourtsUser(userId, req.pagination)
+            : { data: await this.courtService.findDeletedCourtsUser(userId) }
 
-        res.json({ data: courts })
+        res.json(result)
     })
 
     restore = catchAsync(async (req: Request, res: Response) => {
@@ -76,10 +82,10 @@ export class CourtController {
 
         const court = await this.courtService.restore(id, userId)
 
-        res.json({ 
+        res.json({
             message: "Cancha restaurada correctamente",
             court
-         })
+        })
     })
 
     hardDelete = catchAsync(async (req: Request, res: Response) => {

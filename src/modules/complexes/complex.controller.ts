@@ -22,9 +22,11 @@ export class ComplexController {
 
 
     getAll = catchAsync(async (req: Request, res: Response) => {
-        const complexes = await this.complexService.getAllActive()
+        const result = req.pagination
+            ? await this.complexService.getAllActive(req.pagination)
+            : await this.complexService.getAllActive()
 
-        res.json(complexes)
+        res.json(result)
     })
 
 
@@ -54,18 +56,22 @@ export class ComplexController {
     getMyActiveComplexes = catchAsync(async (req: Request, res: Response) => {
         const userData = req.user
 
-        const activeComplexes = await this.complexService.findByOwnerActive(userData)
+        const result = req.pagination
+            ? await this.complexService.findByOwnerActive(userData, req.pagination)
+            : await this.complexService.findByOwnerActive(userData)
 
-        res.json(activeComplexes)
+        res.json(result)
     })
 
 
     getMyDeletedComplexes = catchAsync(async (req: Request, res: Response) => {
         const userData = req.user
 
-        const deletedComplexes = await this.complexService.findByOwnerDeleted(userData)
+        const result = req.pagination
+            ? await this.complexService.findByOwnerDeleted(userData, req.pagination)
+            : await this.complexService.findByOwnerDeleted(userData)
 
-        res.json(deletedComplexes)
+        res.json(result)
     })
 
 
@@ -111,9 +117,11 @@ export class ComplexController {
     getCourts = catchAsync(async (req: Request, res: Response) => {
         const id = Number(req.params.id)
 
-        const courts = await this.complexService.findByComplex(id)
+        const result = req.pagination
+            ? await this.complexService.findByComplex(id, req.pagination)
+            : { data: await this.complexService.findByComplex(id) }
 
-        res.json({ data: courts })
+        res.json(result)
     })
 
 

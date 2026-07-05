@@ -1,20 +1,23 @@
-import { differenceInMinutes, startOfMinute, isValid, addDays, isBefore, addMinutes, parse } from "date-fns" 
+import { Booking } from "@prisma/client"
+import { differenceInMinutes, startOfMinute, isValid, addDays, isBefore, addMinutes, parse } from "date-fns"
 import { toZonedTime, format as formatTz, fromZonedTime } from 'date-fns-tz';
 import { AppError } from "../../utils/appError"
+import { paginateResponse } from "../../utils/paginate"
 import { BookingRepository } from "./booking.repository"
 import { CreateBookingDTO } from "./booking.types"
 import { UserId } from "../../types"
+import type { PaginatedResponse, PaginationQuery } from "../../types/pagination"
 
 export class BookingService {
-    
-    constructor(private readonly bookingRepository: BookingRepository) {}
+
+    constructor(private readonly bookingRepository: BookingRepository) { }
 
     async create(userId: UserId, data: CreateBookingDTO) {
         const COMPLEX_TIMEZONE = 'America/Argentina/Buenos_Aires'
 
         const start = startOfMinute(new Date(data.startTime))
         const end = startOfMinute(new Date(data.endTime))
-        const now = new Date(); 
+        const now = new Date();
 
         // ---------------------------------------------------------
         //           BASIC VALIDATIONS
@@ -43,7 +46,7 @@ export class BookingService {
 
 
         const startInComplexTime = toZonedTime(start, COMPLEX_TIMEZONE)
-        const endInComplexTime   = toZonedTime(end, COMPLEX_TIMEZONE)
+        const endInComplexTime = toZonedTime(end, COMPLEX_TIMEZONE)
         const dayOfWeek = startInComplexTime.getDay()
 
 
@@ -55,15 +58,15 @@ export class BookingService {
         // ---------------------------------------------------------
         //              SCHEDULES VALIDATION
         // ---------------------------------------------------------
-        
+
         const bookingStartStr = formatTz(startInComplexTime, 'HH:mm')
-        const bookingEndStr   = formatTz(endInComplexTime, 'HH:mm')
+        const bookingEndStr = formatTz(endInComplexTime, 'HH:mm')
 
         const isOpen = (bookStart: string, bookEnd: string, open: string, close: string) => {
             if (open < close) {
                 return bookStart >= open && bookEnd <= close;
             }
-            
+
             return (bookStart >= open) || (bookEnd <= close && bookEnd !== "00:00")
         }
 
@@ -83,7 +86,7 @@ export class BookingService {
         if (duration < complexConfig.minBookingDuration) {
             throw new AppError(`El turno mínimo es de ${complexConfig.minBookingDuration} minutos`, 400)
         }
-        
+
         if (duration > complexConfig.maxBookingDuration) {
             throw new AppError(`El turno máximo es de ${complexConfig.maxBookingDuration} minutos`, 400)
         }
@@ -91,18 +94,18 @@ export class BookingService {
         // ---------------------------------------------------------
         //                  PRICE AND CREATE
         // ---------------------------------------------------------
-        
+
         const totalPrice = Math.round((Number(court.price) / 60) * duration)
 
         try {
             const newBooking = await this.bookingRepository.create({
                 courtId: data.courtId,
                 userId,
-                startTime: start, 
+                startTime: start,
                 endTime: end,
                 totalPrice
             })
-            
+
             return newBooking;
 
         } catch (error: any) {
@@ -123,14 +126,14 @@ export class BookingService {
         const parsedDate = parse(dateStr, 'yyyy-MM-dd', new Date())
 
         if (!isValid(parsedDate)) {
-            throw new AppError("Fecha inválida", 400); 
+            throw new AppError("Fecha inválida", 400);
         }
 
         const dateLocal = fromZonedTime(parsedDate, COMPLEX_TIMEZONE)
         const dayOfWeek = dateLocal.getDay()
 
         const schedule = await this.bookingRepository.getComplexSchedule(court.complexId, dayOfWeek)
-        
+
         if (!schedule) return []
 
 
@@ -149,34 +152,34 @@ export class BookingService {
         }
 
         const duration = 60
-        
+
         const slots = []
         let currentTime = openTime
 
-        while (isBefore(currentTime, closeTime)) { 
+        while (isBefore(currentTime, closeTime)) {
             const slotStartUTC = fromZonedTime(currentTime, COMPLEX_TIMEZONE)
             const slotEndUTC = fromZonedTime(addMinutes(currentTime, duration), COMPLEX_TIMEZONE)
-            
+
             const closeTimeUTC = fromZonedTime(closeTime, COMPLEX_TIMEZONE)
-            
+
             if (slotEndUTC <= closeTimeUTC) {
                 slots.push({
                     start: slotStartUTC,
                     end: slotEndUTC,
-                    available: true 
+                    available: true
                 })
             }
-            
+
             currentTime = addMinutes(currentTime, duration)
         }
 
         const bookings = await this.bookingRepository.findBookingsInRange(
-            courtId, 
-            fromZonedTime(openTime, COMPLEX_TIMEZONE), 
+            courtId,
+            fromZonedTime(openTime, COMPLEX_TIMEZONE),
             fromZonedTime(closeTime, COMPLEX_TIMEZONE)
         );
 
-        
+
         const finalSlots = slots.map(slot => {
             const isOccupied = bookings.some(booking => {
                 return (slot.start < booking.endTime) && (slot.end > booking.startTime)
@@ -192,7 +195,18 @@ export class BookingService {
         return finalSlots
     }
 
-    async getMyBookings(userId: UserId) {
-        return await this.bookingRepository.findByUserId(userId)
+    async getMyBookings(userId: UserId): Promise<Booking[]>
+    async getMyBookings(userId: UserId, pagination: PaginationQuery): Promise<PaginatedResponse<Booking>>
+    async getMyBookings(userId: UserId, pagination?: PaginationQuery) {
+        if (!pagination) {
+            return await this.bookingRepository.findByUserId(userId)
+        }
+
+        const { items, total } = await this.bookingRepository.findByUserId(userId, {
+            skip: pagination.skip,
+            take: pagination.take
+        })
+
+        return paginateResponse(items, total, pagination.page, pagination.pageSize)
     }
 }

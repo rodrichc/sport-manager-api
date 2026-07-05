@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/authenticate'
+import { parsePagination } from '../../middleware/pagination'
 import { validateCreateCourt } from './court.validator'
 import { courtController } from './court.dependencies'
 import { validateId } from '../../validators/common'
@@ -11,10 +12,10 @@ router.post('/',
     validateCreateCourt, 
     courtController.create)
     
-router.get('/', courtController.getAll)
+router.get('/', parsePagination, courtController.getAll)
 
-router.get('/my-courts', authenticate, courtController.getUserCourts)
-router.get('/my-deleted', authenticate, courtController.getDeletedUserCourts)
+router.get('/my-courts', authenticate, parsePagination, courtController.getUserCourts)
+router.get('/my-deleted', authenticate, parsePagination, courtController.getDeletedUserCourts)
 
 router.patch('/:id/restore', authenticate, validateId, courtController.restore)
 router.delete('/:id/force', authenticate, validateId, courtController.hardDelete)

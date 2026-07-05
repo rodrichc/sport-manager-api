@@ -15,6 +15,7 @@ jest.mock('../../../config/db', () => ({
             findMany: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
+            count: jest.fn(),
         },
     },
 }))
@@ -322,6 +323,51 @@ describe('CourtRepository', () => {
                 where: { id: 1 },
             })
             expect(result).toEqual(FAKE_COURT)
+        })
+    })
+
+
+    // ═════════════════════════════════════════════════════════
+    //  findAllCourts con paginación
+    // ═════════════════════════════════════════════════════════
+    describe('findAllCourts() con paginación', () => {
+
+        it('debe retornar items paginados y total', async () => {
+            (mockCourt.findMany as jest.Mock).mockResolvedValue([FAKE_COURT])
+            ;(mockCourt.count as jest.Mock).mockResolvedValue(15)
+
+            const result = await repository.findAllCourts({ skip: 0, take: 10 })
+
+            expect(mockCourt.findMany).toHaveBeenCalledWith({
+                where: { deletedAt: null, isActive: true },
+                skip: 0,
+                take: 10,
+            })
+            expect(mockCourt.count).toHaveBeenCalledWith({
+                where: { deletedAt: null, isActive: true },
+            })
+            expect(result).toEqual({ items: [FAKE_COURT], total: 15 })
+        })
+    })
+
+    describe('findCourtsByUserId() con paginación', () => {
+
+        it('debe retornar canchas paginadas del owner', async () => {
+            (mockCourt.findMany as jest.Mock).mockResolvedValue([FAKE_COURT])
+            ;(mockCourt.count as jest.Mock).mockResolvedValue(3)
+
+            const result = await repository.findCourtsByUserId(10, { skip: 0, take: 10 })
+
+            expect(mockCourt.findMany).toHaveBeenCalledWith({
+                where: {
+                    deletedAt: null,
+                    complex: { ownerId: 10 },
+                },
+                skip: 0,
+                take: 10,
+                include: { complex: true },
+            })
+            expect(result).toEqual({ items: [FAKE_COURT], total: 3 })
         })
     })
 })

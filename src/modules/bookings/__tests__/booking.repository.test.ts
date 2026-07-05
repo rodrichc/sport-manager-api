@@ -13,6 +13,11 @@ jest.mock('../../../config/db', () => ({
         booking: {
             findFirst: jest.fn(),
             create: jest.fn(),
+            findMany: jest.fn(),
+            count: jest.fn(),
+        },
+        court: {
+            findMany: jest.fn(),
         },
     },
 }))
@@ -21,6 +26,7 @@ jest.mock('../../../config/db', () => ({
 //  Helpers de tipado para los mocks
 // ─────────────────────────────────────────────────────────────
 const mockDb = db as jest.Mocked<typeof db>
+const mockBooking = mockDb.booking as jest.Mocked<typeof mockDb.booking>
 
 describe('BookingRepository – create()', () => {
 
@@ -211,5 +217,71 @@ describe('BookingRepository – create()', () => {
 
         // Y que sí se creó la reserva
         expect(mockTx.booking.create).toHaveBeenCalledTimes(1)
+    })
+})
+
+
+// ═════════════════════════════════════════════════════════
+//  findByUserId con paginación
+// ═════════════════════════════════════════════════════════
+describe('BookingRepository – findByUserId()', () => {
+
+    let repository: BookingRepository
+
+    const FAKE_BOOKING = {
+        id: 99,
+        courtId: 1,
+        userId: 10,
+        startTime: new Date('2026-07-01T18:00:00Z'),
+        endTime: new Date('2026-07-01T19:00:00Z'),
+        totalPrice: 2000,
+        status: BookingStatus.CONFIRMED,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        repository = new BookingRepository()
+    })
+
+    it('debe retornar reservas sin paginación', async () => {
+        (mockBooking.findMany as jest.Mock).mockResolvedValue([FAKE_BOOKING])
+
+        const result = await repository.findByUserId(10)
+
+        expect(mockBooking.findMany).toHaveBeenCalledWith({
+            where: { userId: 10 },
+            include: {
+                court: {
+                    include: { complex: true },
+                },
+            },
+            orderBy: { startTime: 'desc' },
+        })
+        expect(result).toEqual([FAKE_BOOKING])
+    })
+
+    it('debe retornar items paginados y total', async () => {
+        (mockBooking.findMany as jest.Mock).mockResolvedValue([FAKE_BOOKING])
+        ;(mockBooking.count as jest.Mock).mockResolvedValue(8)
+
+        const result = await repository.findByUserId(10, { skip: 0, take: 10 })
+
+        expect(mockBooking.findMany).toHaveBeenCalledWith({
+            where: { userId: 10 },
+            include: {
+                court: {
+                    include: { complex: true },
+                },
+            },
+            orderBy: { startTime: 'desc' },
+            skip: 0,
+            take: 10,
+        })
+        expect(mockBooking.count).toHaveBeenCalledWith({
+            where: { userId: 10 },
+        })
+        expect(result).toEqual({ items: [FAKE_BOOKING], total: 8 })
     })
 })
