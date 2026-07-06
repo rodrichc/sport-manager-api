@@ -57,6 +57,9 @@ export class AuthService {
             phoneNumber
         })
 
+        // Send verification email automatically upon registration
+        await this.sendVerification(email)
+
         return {
             id: newUser.id,
             name: newUser.name,
