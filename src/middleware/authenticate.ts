@@ -53,6 +53,10 @@ export const authenticate = async(req: Request, res: Response, next: NextFunctio
             next()
         }
     } catch (error) {
-        res.status(500).json({error: 'Token No Válido'})
+        if (error instanceof jwt.JsonWebTokenError) {
+            return res.status(401).json({error: 'Token No Válido'})
+        }
+        console.error('[Auth Middleware Error]:', error)
+        res.status(500).json({error: 'Error interno de autenticación'})
     }
 }
