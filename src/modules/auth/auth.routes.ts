@@ -1,5 +1,6 @@
 import { Router } from "express"
 import { authenticate } from "../../middleware/authenticate"
+import { authenticate2FA } from "../../middleware/authenticate2FA"
 import { 
     validateBecomeOwner, 
     validateLogin, 
@@ -27,6 +28,6 @@ router.post('/reset-password', validateResetPassword, authController.resetPasswo
 router.get('/2fa/generate', authenticate, authController.generate2FA)
 router.post('/2fa/enable', authenticate, validate2FACode, authController.enable2FA)
 // Assumes tempToken is sent via Authorization header
-router.post('/2fa/verify', authenticate, validate2FACode, authController.verify2FA)
+router.post('/2fa/verify', authenticate2FA, validate2FACode, authController.verify2FA)
 
 export default router

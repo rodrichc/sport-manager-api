@@ -11,7 +11,7 @@ declare global {
     }
 }
 
-export const authenticate = async(req: Request, res: Response, next: NextFunction) => {
+export const authenticate2FA = async(req: Request, res: Response, next: NextFunction) => {
     const bearer = req.headers.authorization
 
     if(!bearer){
@@ -29,8 +29,8 @@ export const authenticate = async(req: Request, res: Response, next: NextFunctio
     try {
         const result = jwt.verify(token, process.env.JWT_SECRET_KEY) as jwt.JwtPayload
 
-        if(result.isTemp) {
-            const error = new Error('Se requiere validación 2FA')
+        if(!result.isTemp) {
+            const error = new Error('Token inválido para esta acción')
             return res.status(401).json({error: error.message})
         }
 

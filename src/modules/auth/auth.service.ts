@@ -79,7 +79,7 @@ export class AuthService {
         if(!isPasswordCorrect) throw new AppError('Contraseña incorrecta', 403)
 
         if(user.isTwoFactorEnabled) {
-            return { tempToken: generateJWT({ id: user.id }), is2faRequired: true }
+            return { tempToken: generateJWT({ id: user.id, isTemp: true }), is2faRequired: true }
         }
 
         return { token: generateJWT({ id: user.id }) }
@@ -145,6 +145,8 @@ export class AuthService {
         const totp = getTotp(user.email)
         const secret = totp.generateSecret()
         const otpauthUrl = totp.toURI({ secret })
+        
+        console.log(`[DEV MODE] 🔐 2FA Secret para ${user.email}: ${secret}`)
         
         await this.authRepository.updateUser(user.id, { twoFactorSecret: secret })
         return otpauthUrl
