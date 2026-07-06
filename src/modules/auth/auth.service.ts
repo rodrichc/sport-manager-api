@@ -1,5 +1,6 @@
 import crypto from "crypto"
-import { authenticator } from "otplib"
+import * as otplib from "otplib"
+const { authenticator } = otplib
 import { TokenType } from "@prisma/client"
 import { IEmailService } from "../../services/email/IEmailService"
 import { ResendEmailService } from "../../services/email/ResendEmailService"
