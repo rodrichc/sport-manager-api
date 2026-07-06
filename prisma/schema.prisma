@@ -13,22 +13,22 @@ enum TokenType {
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
-  name        String
-  email       String  @unique
-  username    String  @unique
-  password    String
-  role        String  @default("USER")
-  confirmed          Boolean   @default(false)
+  id                 Int     @id @default(autoincrement())
+  name               String
+  email              String  @unique
+  username           String  @unique
+  password           String
+  role               String  @default("USER")
+  confirmed          Boolean @default(false)
   phoneNumber        String?
   twoFactorSecret    String?
-  isTwoFactorEnabled Boolean   @default(false)
+  isTwoFactorEnabled Boolean @default(false)
   avatar             String?
 
-  complexes          Complex[]
-  bookings           Booking[]
-  tokens             Token[]
-  reviews            Review[]
+  complexes Complex[]
+  bookings  Booking[]
+  tokens    Token[]
+  reviews   Review[]
 }
 
 model Complex {
@@ -36,27 +36,27 @@ model Complex {
   name        String
   description String?
   address     String
-  lat         Float?    //  (Ex: -34.6037)
-  lng         Float?    //  (Ex: -58.3816) 
-  logo        String?    
+  lat         Float? //  (Ex: -34.6037)
+  lng         Float? //  (Ex: -58.3816) 
+  logo        String?
   images      String[]
 
-  schedules   ComplexSchedule[]
-   
-  status      String   @default("PENDING")     
+  schedules ComplexSchedule[]
 
-  ownerId     Int
-  owner       User     @relation(fields: [ownerId], references: [id])
+  status String @default("PENDING")
 
-  createdAt   DateTime @default(now())  
-  updatedAt   DateTime @updatedAt       
-  deletedAt   DateTime?
+  ownerId Int
+  owner   User @relation(fields: [ownerId], references: [id])
 
-  minBookingDuration Int @default(60)  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  minBookingDuration Int @default(60)
   maxBookingDuration Int @default(180)
-  
-  courts      Court[] 
-  reviews     Review[]
+
+  courts  Court[]
+  reviews Review[]
 
   @@index([status, deletedAt])
   @@index([ownerId, deletedAt])
@@ -64,37 +64,36 @@ model Complex {
 
 model ComplexSchedule {
   id        Int    @id @default(autoincrement())
-  dayOfWeek Int    
-  startTime String    // "HH:MM"
-  endTime   String    // "HH:MM"
-  
-  complexId Int
-  complex   Complex @relation(fields: [complexId], references: [id], onDelete: Cascade) 
+  dayOfWeek Int
+  startTime String // "HH:MM"
+  endTime   String // "HH:MM"
 
-  @@index([complexId, dayOfWeek]) 
+  complexId Int
+  complex   Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
+
+  @@index([complexId, dayOfWeek])
 }
 
 model Court {
-  id          Int      @id @default(autoincrement())
-  name        String   
-  sport       String   
-  type        String?  
-  images      String[]
- 
- 
-  price       Decimal  @db.Decimal(10, 2)
-  duration    Int      @default(60)       
-  isIndoor    Boolean  @default(false)    
-  isActive    Boolean  @default(true)
+  id     Int      @id @default(autoincrement())
+  name   String
+  sport  String
+  type   String?
+  images String[]
 
-  complexId   Int
-  complex     Complex  @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  price    Decimal @db.Decimal(10, 2)
+  duration Int     @default(60)
+  isIndoor Boolean @default(false)
+  isActive Boolean @default(true)
 
-  bookings    Booking[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt 
-  deletedAt   DateTime?           
+  complexId Int
+  complex   Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
+
+  bookings Booking[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([complexId, isActive, deletedAt])
   @@index([isActive, deletedAt])
@@ -108,35 +107,37 @@ enum BookingStatus {
 }
 
 model Booking {
-  id          Int      @id @default(autoincrement())
-  
-  courtId     Int
-  court       Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
-  
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  id Int @id @default(autoincrement())
 
-  startTime   DateTime
-  endTime     DateTime
-  
-  totalPrice  Decimal  @db.Decimal(10, 2)
-  status      BookingStatus @default(CONFIRMED)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  courtId Int
+  court   Court @relation(fields: [courtId], references: [id], onDelete: Cascade)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  startTime DateTime
+  endTime   DateTime
+
+  totalPrice Decimal       @db.Decimal(10, 2)
+  status     BookingStatus @default(CONFIRMED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments Payment[]
 
   @@index([courtId, startTime, endTime])
   @@index([userId])
 }
 
 model Token {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
   type      TokenType
   expiresAt DateTime
 
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -144,18 +145,47 @@ model Token {
 }
 
 model Review {
-  id        Int      @id @default(autoincrement())
-  rating    Int
-  comment   String?
-  
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id      Int     @id @default(autoincrement())
+  rating  Int
+  comment String?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   complexId Int
-  complex   Complex  @relation(fields: [complexId], references: [id], onDelete: Cascade)
-  
+  complex   Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
 
   @@index([complexId])
   @@index([userId])
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+
+  bookingId Int
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  amount Decimal       @db.Decimal(10, 2)
+  status PaymentStatus @default(PENDING)
+
+  preferenceId         String? @unique
+  mercadopagoPaymentId String? @unique
+  externalReference    String? @unique
+  paymentMethod        String?
+  statusDetail         String?
+  rawResponse          Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingId])
 }
