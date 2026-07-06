@@ -71,7 +71,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"var token = pm.response.text(); \r",
+									"var jsonData = pm.response.json();\r",
+									"var token = jsonData.token || jsonData.tempToken;\r",
 									"\r",
 									"pm.environment.set(\"token\", token);"
 								],
@@ -113,7 +114,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"var token = pm.response.text(); \r",
+									"var jsonData = pm.response.json();\r",
+									"var token = jsonData.token || jsonData.tempToken;\r",
 									"\r",
 									"pm.environment.set(\"token\", token);"
 								],
