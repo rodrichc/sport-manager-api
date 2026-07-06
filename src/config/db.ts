@@ -12,10 +12,10 @@ export const db = (globalForPrisma.prisma || new PrismaClient()).$extends({
                         ?.fields.some((f) => f.name === 'deletedAt');
 
                     if (hasDeletedAt) {
-                        args = args || {};
-                        args.where = args.where || {};
-                        if (args.where.deletedAt === undefined) {
-                            args.where.deletedAt = null;
+                        args = args || {} as any;
+                        (args as any).where = (args as any).where || {};
+                        if ((args as any).where.deletedAt === undefined) {
+                            (args as any).where.deletedAt = null;
                         }
                     }
                 }
