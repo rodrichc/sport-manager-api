@@ -1,6 +1,14 @@
 import crypto from "crypto"
-import * as otplib from "otplib"
-const { authenticator } = otplib
+import { TOTP, NobleCryptoPlugin, ScureBase32Plugin } from "otplib"
+
+function getTotp(email: string = 'user') {
+    return new TOTP({
+        issuer: 'SportManager',
+        label: email,
+        crypto: new NobleCryptoPlugin(),
+        base32: new ScureBase32Plugin()
+    });
+}
 import { TokenType } from "@prisma/client"
 import { IEmailService } from "../../services/email/IEmailService"
 import { ResendEmailService } from "../../services/email/ResendEmailService"
@@ -131,8 +139,9 @@ export class AuthService {
         if(!user) throw new AppError('Usuario no encontrado', 404)
         if(user.isTwoFactorEnabled) throw new AppError('2FA ya está habilitado', 400)
 
-        const secret = authenticator.generateSecret()
-        const otpauthUrl = authenticator.keyuri(user.email, 'SportManager', secret)
+        const totp = getTotp(user.email)
+        const secret = totp.generateSecret()
+        const otpauthUrl = totp.toURI({ secret })
         
         await this.authRepository.updateUser(user.id, { twoFactorSecret: secret })
         return otpauthUrl
@@ -142,8 +151,9 @@ export class AuthService {
         const user = await this.authRepository.findById(userId)
         if(!user || !user.twoFactorSecret) throw new AppError('Configuración 2FA incompleta', 400)
         
-        const isValid = authenticator.verify({ token: code, secret: user.twoFactorSecret })
-        if(!isValid) throw new AppError('Código inválido', 400)
+        const totp = getTotp(user.email)
+        const result = await totp.verify(code, { secret: user.twoFactorSecret })
+        if(!result.valid) throw new AppError('Código inválido', 400)
         
         await this.authRepository.updateUser(user.id, { isTwoFactorEnabled: true })
     }
@@ -152,8 +162,9 @@ export class AuthService {
         const user = await this.authRepository.findById(userId)
         if(!user || !user.isTwoFactorEnabled || !user.twoFactorSecret) throw new AppError('2FA no configurado', 400)
 
-        const isValid = authenticator.verify({ token: code, secret: user.twoFactorSecret })
-        if(!isValid) throw new AppError('Código inválido', 400)
+        const totp = getTotp(user.email)
+        const result = await totp.verify(code, { secret: user.twoFactorSecret })
+        if(!result.valid) throw new AppError('Código inválido', 400)
 
         return generateJWT({ id: user.id })
     }
