@@ -28,6 +28,7 @@ model User {
   complexes          Complex[]
   bookings           Booking[]
   tokens             Token[]
+  reviews            Review[]
 }
 
 model Complex {
@@ -38,6 +39,7 @@ model Complex {
   lat         Float?    //  (Ex: -34.6037)
   lng         Float?    //  (Ex: -58.3816) 
   logo        String?    
+  images      String[]
 
   schedules   ComplexSchedule[]
    
@@ -54,6 +56,7 @@ model Complex {
   maxBookingDuration Int @default(180)
   
   courts      Court[] 
+  reviews     Review[]
 
   @@index([status, deletedAt])
   @@index([ownerId, deletedAt])
@@ -76,7 +79,8 @@ model Court {
   name        String   
   sport       String   
   type        String?  
-  
+  images      String[]
+ 
  
   price       Decimal  @db.Decimal(10, 2)
   duration    Int      @default(60)       
@@ -136,5 +140,22 @@ model Token {
 
   createdAt DateTime @default(now())
 
+  @@index([userId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  complexId Int
+  complex   Complex  @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@index([complexId])
   @@index([userId])
 }
