@@ -26,10 +26,9 @@ export class ComplexRepository {
 
     async findAllActive(): Promise<Complex[]>
     async findAllActive(pagination: { skip: number; take: number }): Promise<PaginatedResult<Complex>>
-    async findAllActive(pagination?: { skip: number; take: number }) {
-        const where = {
-            status: 'APPROVED',
-            deletedAt: null
+    async findAllActive(pagination?: { skip: number; take: number }): Promise<Complex[] | PaginatedResult<Complex>> {
+        const where: any = {
+            status: 'APPROVED'
         }
 
         if (pagination) {
@@ -58,8 +57,7 @@ export class ComplexRepository {
     async findActiveById(id: ComplexId) {
         return await db.complex.findFirst({
             where: {
-                id,
-                deletedAt: null
+                id
             },
             include: {
                 schedules: true,
@@ -86,10 +84,9 @@ export class ComplexRepository {
 
     async findActiveByOwner(userId: UserId): Promise<Complex[]>
     async findActiveByOwner(userId: UserId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Complex>>
-    async findActiveByOwner(userId: UserId, pagination?: { skip: number; take: number }) {
+    async findActiveByOwner(userId: UserId, pagination?: { skip: number; take: number }): Promise<Complex[] | PaginatedResult<Complex>> {
         const where = {
-            ownerId: userId,
-            deletedAt: null
+            ownerId: userId
         }
 
         if (pagination) {
@@ -115,7 +112,7 @@ export class ComplexRepository {
 
     async findDeletedByOwner(userId: UserId): Promise<Complex[]>
     async findDeletedByOwner(userId: UserId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Complex>>
-    async findDeletedByOwner(userId: UserId, pagination?: { skip: number; take: number }) {
+    async findDeletedByOwner(userId: UserId, pagination?: { skip: number; take: number }): Promise<Complex[] | PaginatedResult<Complex>> {
         const where = {
             ownerId: userId,
             deletedAt: { not: null }
@@ -171,8 +168,7 @@ export class ComplexRepository {
     async findCourtsById(complexId: ComplexId, pagination?: { skip: number; take: number }) {
         const where = {
             complexId,
-            isActive: true,
-            deletedAt: null
+            isActive: true
         }
 
         if (pagination) {

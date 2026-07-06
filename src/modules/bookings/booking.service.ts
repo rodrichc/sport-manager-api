@@ -13,7 +13,7 @@ export class BookingService {
     constructor(private readonly bookingRepository: BookingRepository) { }
 
     async create(userId: UserId, data: CreateBookingDTO) {
-        const COMPLEX_TIMEZONE = 'America/Argentina/Buenos_Aires'
+        const COMPLEX_TIMEZONE = process.env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires'
 
         const start = startOfMinute(new Date(data.startTime))
         const end = startOfMinute(new Date(data.endTime))
@@ -119,9 +119,10 @@ export class BookingService {
 
 
     async getAvailability(courtId: number, dateStr: string) {
-        const COMPLEX_TIMEZONE = 'America/Argentina/Buenos_Aires'
+        const COMPLEX_TIMEZONE = process.env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires'
 
         const court = await this.bookingRepository.getCourtPrice(courtId)
+        if (!court) throw new AppError("Cancha no encontrada", 404)
 
         const parsedDate = parse(dateStr, 'yyyy-MM-dd', new Date())
 

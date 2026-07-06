@@ -32,8 +32,7 @@ export class CourtRepository {
     async findCourt(id: CourtId) {
         return await db.court.findFirst({
             where: {
-                id,
-                deletedAt: null
+                id
             },
             include: { complex: true }
         })
@@ -55,9 +54,8 @@ export class CourtRepository {
 
     async findCourtsByUserId(userId: UserId): Promise<Court[]>
     async findCourtsByUserId(userId: UserId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Court>>
-    async findCourtsByUserId(userId: UserId, pagination?: { skip: number; take: number }) {
+    async findCourtsByUserId(userId: UserId, pagination?: { skip: number; take: number }): Promise<Court[] | PaginatedResult<Court>> {
         const where = {
-            deletedAt: null,
             complex: {
                 ownerId: userId
             }
@@ -84,7 +82,7 @@ export class CourtRepository {
 
     async findDeletedCourtsByUserId(userId: UserId): Promise<Court[]>
     async findDeletedCourtsByUserId(userId: UserId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Court>>
-    async findDeletedCourtsByUserId(userId: UserId, pagination?: { skip: number; take: number }) {
+    async findDeletedCourtsByUserId(userId: UserId, pagination?: { skip: number; take: number }): Promise<Court[] | PaginatedResult<Court>> {
         const where = {
             deletedAt: { not: null },
             complex: {
@@ -115,7 +113,6 @@ export class CourtRepository {
     async findAllCourts(pagination: { skip: number; take: number }): Promise<PaginatedResult<Court>>
     async findAllCourts(pagination?: { skip: number; take: number }) {
         const where = {
-            deletedAt: null,
             isActive: true
         }
 

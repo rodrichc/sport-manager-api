@@ -22,8 +22,8 @@ describe('BookingService – create()', () => {
     const FAKE_USER_ID = 10
 
     // Fechas futuras para un lunes a las 18:00-19:00 (dentro de horario)
-    const FUTURE_START = new Date('2026-07-06T21:00:00Z')  // Lun 18:00 AR
-    const FUTURE_END = new Date('2026-07-06T22:00:00Z')    // Lun 19:00 AR
+    const FUTURE_START = new Date('2027-07-05T21:00:00Z')  // Lun 18:00 AR
+    const FUTURE_END = new Date('2027-07-05T22:00:00Z')    // Lun 19:00 AR
 
     const INPUT_DTO = {
         courtId: 1,

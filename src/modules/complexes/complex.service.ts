@@ -1,4 +1,4 @@
-import { Complex } from "@prisma/client";
+import { Complex, Court } from "@prisma/client";
 import { ComplexId, UserId, UserSafe } from "../../types";
 import type { PaginatedResponse, PaginationQuery } from "../../types/pagination";
 import { AppError } from "../../utils/appError";
@@ -121,8 +121,8 @@ export class ComplexService {
     }
 
 
-    async findByComplex(complexId: ComplexId): Promise<Complex['courts']>
-    async findByComplex(complexId: ComplexId, pagination: PaginationQuery): Promise<PaginatedResponse<Complex['courts'][number]>>
+    async findByComplex(complexId: ComplexId): Promise<Court[]>
+    async findByComplex(complexId: ComplexId, pagination: PaginationQuery): Promise<PaginatedResponse<Court>>
     async findByComplex(complexId: ComplexId, pagination?: PaginationQuery) {
         if (!pagination) {
             return await this.complexRepository.findCourtsById(complexId)

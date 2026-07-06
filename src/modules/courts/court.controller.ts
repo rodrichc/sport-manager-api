@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { CourtService } from "./court.service"
 import { CourtDTO } from "./court.types"
 import { catchAsync } from "../../utils/catchAsync"
+import { getPagination } from "../../types/pagination"
 
 export class CourtController {
 
@@ -49,8 +50,9 @@ export class CourtController {
     })
 
     getAll = catchAsync(async (req: Request, res: Response) => {
-        const result = req.pagination
-            ? await this.courtService.findAll(req.pagination)
+        const pagination = getPagination(req)
+        const result = pagination
+            ? await this.courtService.findAll(pagination)
             : { data: await this.courtService.findAll() }
 
         res.json(result)
@@ -58,9 +60,10 @@ export class CourtController {
 
     getUserCourts = catchAsync(async (req: Request, res: Response) => {
         const userId = req.user.id
+        const pagination = getPagination(req)
 
-        const result = req.pagination
-            ? await this.courtService.findCourtsUser(userId, req.pagination)
+        const result = pagination
+            ? await this.courtService.findCourtsUser(userId, pagination)
             : { data: await this.courtService.findCourtsUser(userId) }
 
         res.json(result)
@@ -68,9 +71,10 @@ export class CourtController {
 
     getDeletedUserCourts = catchAsync(async (req: Request, res: Response) => {
         const userId = req.user.id
+        const pagination = getPagination(req)
 
-        const result = req.pagination
-            ? await this.courtService.findDeletedCourtsUser(userId, req.pagination)
+        const result = pagination
+            ? await this.courtService.findDeletedCourtsUser(userId, pagination)
             : { data: await this.courtService.findDeletedCourtsUser(userId) }
 
         res.json(result)

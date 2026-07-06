@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { catchAsync } from "../../utils/catchAsync"
+import { getPagination } from "../../types/pagination"
 import { ComplexService } from "./complex.service"
 import { CreateComplexDTO, UpdateComplexDTO } from "./complex.types"
 
@@ -22,8 +23,9 @@ export class ComplexController {
 
 
     getAll = catchAsync(async (req: Request, res: Response) => {
-        const result = req.pagination
-            ? await this.complexService.getAllActive(req.pagination)
+        const pagination = getPagination(req)
+        const result = pagination
+            ? await this.complexService.getAllActive(pagination)
             : await this.complexService.getAllActive()
 
         res.json(result)
@@ -55,9 +57,10 @@ export class ComplexController {
 
     getMyActiveComplexes = catchAsync(async (req: Request, res: Response) => {
         const userData = req.user
+        const pagination = getPagination(req)
 
-        const result = req.pagination
-            ? await this.complexService.findByOwnerActive(userData, req.pagination)
+        const result = pagination
+            ? await this.complexService.findByOwnerActive(userData, pagination)
             : await this.complexService.findByOwnerActive(userData)
 
         res.json(result)
@@ -66,9 +69,10 @@ export class ComplexController {
 
     getMyDeletedComplexes = catchAsync(async (req: Request, res: Response) => {
         const userData = req.user
+        const pagination = getPagination(req)
 
-        const result = req.pagination
-            ? await this.complexService.findByOwnerDeleted(userData, req.pagination)
+        const result = pagination
+            ? await this.complexService.findByOwnerDeleted(userData, pagination)
             : await this.complexService.findByOwnerDeleted(userData)
 
         res.json(result)
@@ -116,9 +120,10 @@ export class ComplexController {
 
     getCourts = catchAsync(async (req: Request, res: Response) => {
         const id = Number(req.params.id)
+        const pagination = getPagination(req)
 
-        const result = req.pagination
-            ? await this.complexService.findByComplex(id, req.pagination)
+        const result = pagination
+            ? await this.complexService.findByComplex(id, pagination)
             : { data: await this.complexService.findByComplex(id) }
 
         res.json(result)

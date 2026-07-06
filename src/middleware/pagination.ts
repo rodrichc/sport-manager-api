@@ -18,7 +18,8 @@ export const parsePagination = (req: Request, _res: Response, next: NextFunction
         Math.max(1, parseInt(rawPageSize as string, 10) || DEFAULT_PAGE_SIZE),
     )
 
-    req.pagination = {
+    // Cast to any — pagination property is declared in express.d.ts but ts-node doesn't pick it up
+    ;(req as any).pagination = {
         page,
         pageSize,
         skip: (page - 1) * pageSize,

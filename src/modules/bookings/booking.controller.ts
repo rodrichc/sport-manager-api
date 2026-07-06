@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { BookingService } from "./booking.service"
 import { catchAsync } from "../../utils/catchAsync"
+import { getPagination } from "../../types/pagination"
 import { CreateBookingDTO } from "./booking.types"
 import { UserId } from "../../types"
 
@@ -33,9 +34,10 @@ export class BookingController {
 
     getMyBookings = catchAsync(async (req: Request, res: Response) => {
         const userId: UserId = req.user.id
+        const pagination = getPagination(req)
 
-        const result = req.pagination
-            ? await this.bookingService.getMyBookings(userId, req.pagination)
+        const result = pagination
+            ? await this.bookingService.getMyBookings(userId, pagination)
             : { data: await this.bookingService.getMyBookings(userId) }
 
         res.status(200).json(result)

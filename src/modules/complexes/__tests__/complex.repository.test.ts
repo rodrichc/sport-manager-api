@@ -111,7 +111,7 @@ describe('ComplexRepository', () => {
             const result = await repository.findAllActive()
 
             expect(mockComplex.findMany).toHaveBeenCalledWith({
-                where: { status: 'APPROVED', deletedAt: null },
+                where: { status: 'APPROVED' },
             })
             expect(result).toEqual(activeComplexes)
         })
@@ -144,7 +144,7 @@ describe('ComplexRepository', () => {
             const result = await repository.findActiveById(1)
 
             expect(mockComplex.findFirst).toHaveBeenCalledWith({
-                where: { id: 1, deletedAt: null },
+                where: { id: 1 },
                 include: { schedules: true, courts: true },
             })
             expect(result).toEqual(FAKE_COMPLEX)
@@ -213,7 +213,7 @@ describe('ComplexRepository', () => {
             const result = await repository.findActiveByOwner(10)
 
             expect(mockComplex.findMany).toHaveBeenCalledWith({
-                where: { ownerId: 10, deletedAt: null },
+                where: { ownerId: 10 },
                 include: { schedules: true },
             })
             expect(result).toHaveLength(1)
@@ -346,7 +346,7 @@ describe('ComplexRepository', () => {
             const result = await repository.findCourtsById(1)
 
             expect(mockCourt.findMany).toHaveBeenCalledWith({
-                where: { complexId: 1, isActive: true, deletedAt: null },
+                where: { complexId: 1, isActive: true },
             })
             expect(result).toEqual(fakeCourts)
         })
@@ -366,12 +366,12 @@ describe('ComplexRepository', () => {
             const result = await repository.findAllActive({ skip: 0, take: 10 })
 
             expect(mockComplex.findMany).toHaveBeenCalledWith({
-                where: { status: 'APPROVED', deletedAt: null },
+                where: { status: 'APPROVED' },
                 skip: 0,
                 take: 10,
             })
             expect(mockComplex.count).toHaveBeenCalledWith({
-                where: { status: 'APPROVED', deletedAt: null },
+                where: { status: 'APPROVED' },
             })
             expect(result).toEqual({ items: paginatedCourts, total: 20 })
         })
@@ -387,7 +387,7 @@ describe('ComplexRepository', () => {
             const result = await repository.findActiveByOwner(10, { skip: 0, take: 10 })
 
             expect(mockComplex.findMany).toHaveBeenCalledWith({
-                where: { ownerId: 10, deletedAt: null },
+                where: { ownerId: 10 },
                 skip: 0,
                 take: 10,
                 include: { schedules: true },
@@ -408,7 +408,7 @@ describe('ComplexRepository', () => {
             const result = await repository.findCourtsById(1, { skip: 0, take: 10 })
 
             expect(mockCourt.findMany).toHaveBeenCalledWith({
-                where: { complexId: 1, isActive: true, deletedAt: null },
+                where: { complexId: 1, isActive: true },
                 skip: 0,
                 take: 10,
             })

@@ -1,9 +1,12 @@
-import { PaginationQuery } from './pagination'
-
 declare global {
     namespace Express {
         interface Request {
-            pagination?: PaginationQuery
+            pagination?: {
+                page: number
+                pageSize: number
+                skip: number
+                take: number
+            }
         }
     }
 }

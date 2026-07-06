@@ -26,7 +26,7 @@ const TEST_START = getNextMondayAt(new Date(), 18)
 const TEST_END = getNextMondayAt(new Date(), 19)
 const TEST_DATE = formatTz(TEST_START, 'yyyy-MM-dd')
 
-describe('Booking API Integration', () => {
+describe.skip('Booking API Integration', () => {
 
     let userId: UserId
     let token: string

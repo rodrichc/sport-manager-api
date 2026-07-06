@@ -1,3 +1,5 @@
+import type { Request } from 'express'
+
 export interface PaginationQuery {
     page: number
     pageSize: number
@@ -18,4 +20,12 @@ export interface PaginatedResponse<T> {
 export interface PaginatedResult<T> {
     items: T[]
     total: number
+}
+
+/**
+ * Extract pagination params from request.
+ * Returns undefined if no pagination params were provided (backward compat).
+ */
+export function getPagination(req: Request): PaginationQuery | undefined {
+    return (req as any).pagination as PaginationQuery | undefined
 }

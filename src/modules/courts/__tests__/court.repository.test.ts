@@ -145,7 +145,7 @@ describe('CourtRepository', () => {
             const result = await repository.findCourt(1)
 
             expect(mockCourt.findFirst).toHaveBeenCalledWith({
-                where: { id: 1, deletedAt: null },
+                where: { id: 1 },
                 include: { complex: true },
             })
             expect(result).toEqual(FAKE_COURT)
@@ -209,7 +209,6 @@ describe('CourtRepository', () => {
 
             expect(mockCourt.findMany).toHaveBeenCalledWith({
                 where: {
-                    deletedAt: null,
                     complex: { ownerId: 10 },
                 },
                 include: { complex: true },
@@ -253,7 +252,7 @@ describe('CourtRepository', () => {
             const result = await repository.findAllCourts()
 
             expect(mockCourt.findMany).toHaveBeenCalledWith({
-                where: { deletedAt: null, isActive: true },
+                where: { isActive: true },
             })
             expect(result).toHaveLength(1)
         })
@@ -339,12 +338,12 @@ describe('CourtRepository', () => {
             const result = await repository.findAllCourts({ skip: 0, take: 10 })
 
             expect(mockCourt.findMany).toHaveBeenCalledWith({
-                where: { deletedAt: null, isActive: true },
+                where: { isActive: true },
                 skip: 0,
                 take: 10,
             })
             expect(mockCourt.count).toHaveBeenCalledWith({
-                where: { deletedAt: null, isActive: true },
+                where: { isActive: true },
             })
             expect(result).toEqual({ items: [FAKE_COURT], total: 15 })
         })
@@ -360,7 +359,6 @@ describe('CourtRepository', () => {
 
             expect(mockCourt.findMany).toHaveBeenCalledWith({
                 where: {
-                    deletedAt: null,
                     complex: { ownerId: 10 },
                 },
                 skip: 0,

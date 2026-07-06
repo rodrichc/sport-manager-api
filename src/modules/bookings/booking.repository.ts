@@ -81,7 +81,7 @@ export class BookingRepository {
 
     async findByUserId(userId: UserId): Promise<Booking[]>
     async findByUserId(userId: UserId, pagination: { skip: number; take: number }): Promise<PaginatedResult<Booking>>
-    async findByUserId(userId: UserId, pagination?: { skip: number; take: number }) {
+    async findByUserId(userId: UserId, pagination?: { skip: number; take: number }): Promise<Booking[] | PaginatedResult<Booking>> {
         const where = { userId }
 
         const include = {
