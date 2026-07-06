@@ -1267,6 +1267,68 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "REVIEWS",
+			"item": [
+				{
+					"name": "Create Review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"rating\":5,\"comment\":\"Excelente lugar, muy bien cuidado.\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/complexes/1/reviews",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"complexes",
+								"1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Complex Reviews",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/complexes/1/reviews",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"complexes",
+								"1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
