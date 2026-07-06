@@ -24,22 +24,39 @@ export class ComplexRepository {
         })
     }
 
-    async findAllActive(): Promise<Complex[]>
-    async findAllActive(pagination: { skip: number; take: number }): Promise<PaginatedResult<Complex>>
-    async findAllActive(pagination?: { skip: number; take: number }): Promise<Complex[] | PaginatedResult<Complex>> {
+    async findAllActive(search?: string): Promise<Complex[]>
+    async findAllActive(pagination: { skip: number; take: number }, search?: string): Promise<PaginatedResult<Complex>>
+    async findAllActive(paginationOrSearch?: { skip: number; take: number } | string, searchOpt?: string): Promise<Complex[] | PaginatedResult<Complex>> {
+        let pagination;
+        let search;
+        
+        if (typeof paginationOrSearch === 'string') {
+            search = paginationOrSearch;
+        } else {
+            pagination = paginationOrSearch;
+            search = searchOpt;
+        }
+
         const where: any = {
             status: 'APPROVED'
         }
 
+        if (search) {
+            where.OR = [
+                { name: { contains: search, mode: 'insensitive' } },
+                { address: { contains: search, mode: 'insensitive' } }
+            ]
+        }
+
         if (pagination) {
             const [items, total] = await Promise.all([
-                db.complex.findMany({ where, skip: pagination.skip, take: pagination.take }),
+                db.complex.findMany({ where, skip: pagination.skip, take: pagination.take, include: { owner: true } }),
                 db.complex.count({ where })
             ])
             return { items, total }
         }
 
-        return await db.complex.findMany({ where })
+        return await db.complex.findMany({ where, include: { owner: true } })
     }
 
     async findById(id: ComplexId) {

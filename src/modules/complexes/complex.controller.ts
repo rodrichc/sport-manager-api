@@ -24,9 +24,11 @@ export class ComplexController {
 
     getAll = catchAsync(async (req: Request, res: Response) => {
         const pagination = getPagination(req)
+        const search = req.query.search as string | undefined;
+
         const result = pagination
-            ? await this.complexService.getAllActive(pagination)
-            : await this.complexService.getAllActive()
+            ? await this.complexService.getAllActive(pagination, search)
+            : await this.complexService.getAllActive(search)
 
         res.json(result)
     })

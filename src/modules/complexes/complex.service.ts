@@ -20,19 +20,40 @@ export class ComplexService {
         return await this.complexRepository.create(data, user.id)
     }
 
-    async getAllActive(): Promise<Complex[]>
-    async getAllActive(pagination: PaginationQuery): Promise<PaginatedResponse<Complex>>
-    async getAllActive(pagination?: PaginationQuery) {
+    async getAllActive(search?: string): Promise<any[]>
+    async getAllActive(pagination: PaginationQuery, search?: string): Promise<PaginatedResponse<any>>
+    async getAllActive(paginationOrSearch?: PaginationQuery | string, searchOpt?: string) {
+        let pagination;
+        let search;
+        
+        if (typeof paginationOrSearch === 'string') {
+            search = paginationOrSearch;
+        } else {
+            pagination = paginationOrSearch;
+            search = searchOpt;
+        }
+
         if (!pagination) {
-            return await this.complexRepository.findAllActive()
+            const complexes = await this.complexRepository.findAllActive(search)
+            return this.mapComplexesWithWhatsapp(complexes)
         }
 
         const { items, total } = await this.complexRepository.findAllActive({
             skip: pagination.skip,
             take: pagination.take
-        })
+        }, search)
 
-        return paginateResponse(items, total, pagination.page, pagination.pageSize)
+        return paginateResponse(this.mapComplexesWithWhatsapp(items), total, pagination.page, pagination.pageSize)
+    }
+
+    private mapComplexesWithWhatsapp(complexes: any[]) {
+        return complexes.map((c: any) => {
+            const phone = c.owner?.phoneNumber || "5491100000000";
+            return {
+                ...c,
+                whatsappLink: `https://wa.me/${phone.replace(/[^0-9]/g, '')}`
+            };
+        });
     }
 
     async update(data: UpdateComplexDTO, user: UserSafe, id: ComplexId) {

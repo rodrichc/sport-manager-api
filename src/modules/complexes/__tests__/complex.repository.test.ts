@@ -112,6 +112,7 @@ describe('ComplexRepository', () => {
 
             expect(mockComplex.findMany).toHaveBeenCalledWith({
                 where: { status: 'APPROVED' },
+                include: { owner: true },
             })
             expect(result).toEqual(activeComplexes)
         })
@@ -369,6 +370,7 @@ describe('ComplexRepository', () => {
                 where: { status: 'APPROVED' },
                 skip: 0,
                 take: 10,
+                include: { owner: true },
             })
             expect(mockComplex.count).toHaveBeenCalledWith({
                 where: { status: 'APPROVED' },

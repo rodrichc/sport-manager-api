@@ -4,6 +4,7 @@ import { optionalAuthenticate } from "../../middleware/optionalAuth"
 import { parsePagination } from "../../middleware/pagination"
 import { validateCreateComplex, validateRestoreComplex, validateUpdateComplex, validateUpdateComplexStatus, validateUpdateSchedules } from "./complex.validator"
 import { complexController } from "./complex.dependencies"
+import reviewRoutes from "../reviews/review.routes"
 
 const router = Router()
 
@@ -65,5 +66,7 @@ router.get('/:id/courts',
     parsePagination,
     complexController.getCourts
 )
+
+router.use('/:id/reviews', reviewRoutes)
     
 export default router
