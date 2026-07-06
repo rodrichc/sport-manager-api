@@ -1,54 +1,44 @@
-import { body } from 'express-validator'
-import { handleInputErrors } from '../../middleware/validation'
-
+import { body } from "express-validator"
+import { handleInputErrors } from "../../middleware/validation"
 
 export const validateRegister = [
-    body('name')
-        .notEmpty()
-        .withMessage('El Nombre es obligatorio.'),
-    body('email')
-        .isEmail()
-        .withMessage('Email no válido.'),
-    body('username')
-        .notEmpty()
-        .withMessage('El Nombre de Usuario es obligatorio.'),
-    body('password')
-        .isLength({min: 8})
-        .withMessage('La Contraseña debe ser de al menos de 8 caracteres.'),
-    body('role')
-        .optional()
-        .isIn(['USER', 'OWNER'])
-        .withMessage('Rol inválido'),
-    body('phoneNumber')
-        .optional()
-        .matches(/^[0-9]+$/)
-        .withMessage('Poné solo números, sin guiones ni espacios')
-        .isLength({ min: 10, max: 15 })
-        .withMessage('El número debe tener al menos 10 dígitos'),
-        
-    handleInputErrors, 
+    body('name').notEmpty().withMessage('El nombre no puede ir vacío'),
+    body('email').isEmail().withMessage('El email no es válido'),
+    body('password').isLength({ min: 8 }).withMessage('La contraseña es muy corta'),
+    body('username').notEmpty().withMessage('El nombre de usuario no puede ir vacío'),
+    body('role').optional().isIn(['USER', 'OWNER']).withMessage('El rol debe ser válido'),
+    body('phoneNumber').optional().isString().withMessage('El teléfono no es válido'),
+    handleInputErrors
 ]
 
-
 export const validateLogin = [
-    body('email')
-        .isEmail()
-        .withMessage('Email no válido.'),
-    body('password')
-        .notEmpty()
-        .withMessage('La contraseña es obligatoria'),
-
-    handleInputErrors, 
+    body('email').isEmail().withMessage('El email no es válido'),
+    body('password').notEmpty().withMessage('La contraseña es obligatoria'),
+    handleInputErrors
 ]
 
 export const validateBecomeOwner = [
-    body('phoneNumber')
-        .notEmpty()
-        .withMessage('El teléfono es obligatorio')
-        .matches(/^[0-9]+$/)
-        .withMessage('Poné solo números, sin guiones ni espacios')
-        .isLength({ min: 10, max: 15 })
-        .withMessage('El número debe tener al menos 10 dígitos (Ej: 351...)'),
+    body('phoneNumber').notEmpty().withMessage('El teléfono es obligatorio'),
+    handleInputErrors
+]
 
-    handleInputErrors, 
+export const validateEmail = [
+    body('email').isEmail().withMessage('Debe ser un email válido'),
+    handleInputErrors
+]
+
+export const validateToken = [
+    body('token').notEmpty().withMessage('El token es obligatorio'),
+    handleInputErrors
+]
+
+export const validateResetPassword = [
+    body('token').notEmpty().withMessage('El token es obligatorio'),
+    body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+    handleInputErrors
+]
+
+export const validate2FACode = [
+    body('code').notEmpty().withMessage('El código es obligatorio'),
+    handleInputErrors
 ]

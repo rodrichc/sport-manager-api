@@ -74,7 +74,7 @@ describe('AuthService', () => {
             username: 'rodrichc',
             role: 'USER',
             password: 'hashed_password_123',
-            confirmed: false,
+            confirmed: true,
             phoneNumber: null,
         }
 
@@ -226,7 +226,7 @@ describe('AuthService', () => {
             username: 'rodrichc',
             password: 'hashed_stored_password',
             role: 'USER',
-            confirmed: false,
+            confirmed: true,
             phoneNumber: null,
         }
 
@@ -250,7 +250,7 @@ describe('AuthService', () => {
             expect(generateJWT).toHaveBeenCalledWith({ id: EXISTING_USER.id })
 
             // Verificar que retorna el token
-            expect(result).toBe('fake.jwt.token')
+            expect(result).toEqual({ token: 'fake.jwt.token' })
         })
 
 

@@ -256,3 +256,123 @@
  *       401:
  *         description: No autorizado — token faltante o inválido
  */
+/**
+ * @swagger
+ * /auth/send-verification:
+ *   post:
+ *     summary: Enviar email de verificación
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email enviado
+ * 
+ * /auth/verify-email:
+ *   post:
+ *     summary: Verificar email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Verificado correctamente
+ * 
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Olvidé mi contraseña
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email enviado
+ * 
+ * /auth/reset-password:
+ *   post:
+ *     summary: Restablecer contraseña
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Contraseña restablecida
+ * 
+ * /auth/2fa/generate:
+ *   get:
+ *     summary: Generar código QR para 2FA
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Código QR generado
+ * 
+ * /auth/2fa/enable:
+ *   post:
+ *     summary: Habilitar 2FA
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 2FA habilitado
+ * 
+ * /auth/2fa/verify:
+ *   post:
+ *     summary: Verificar 2FA y obtener token final
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Token generado
+ */

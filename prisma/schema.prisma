@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
 model User {
   id          Int     @id @default(autoincrement())
   name        String
@@ -14,11 +19,15 @@ model User {
   username    String  @unique
   password    String
   role        String  @default("USER")
-  confirmed   Boolean @default(false)
-  phoneNumber String?
+  confirmed          Boolean   @default(false)
+  phoneNumber        String?
+  twoFactorSecret    String?
+  isTwoFactorEnabled Boolean   @default(false)
+  avatar             String?
 
-  complexes   Complex[]
-  bookings    Booking[]
+  complexes          Complex[]
+  bookings           Booking[]
+  tokens             Token[]
 }
 
 model Complex {
@@ -113,5 +122,19 @@ model Booking {
   updatedAt   DateTime @updatedAt
 
   @@index([courtId, startTime, endTime])
+  @@index([userId])
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  type      TokenType
+  expiresAt DateTime
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
   @@index([userId])
 }
