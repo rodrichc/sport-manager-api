@@ -1331,6 +1331,48 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "PAYMENTS",
+			"item": [
+				{
+					"name": "MercadoPago Webhook",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"payment.updated\",\n    \"api_version\": \"v1\",\n    \"data\": {\n        \"id\": \"123456789\"\n    },\n    \"date_created\": \"2026-07-06T21:00:00Z\",\n    \"id\": 987654321,\n    \"live_mode\": false,\n    \"type\": \"payment\",\n    \"user_id\": \"44444\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/payments/webhook?data.id=123456789&type=payment",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payments",
+								"webhook"
+							],
+							"query": [
+								{
+									"key": "data.id",
+									"value": "123456789"
+								},
+								{
+									"key": "type",
+									"value": "payment"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
