@@ -66,6 +66,7 @@ export class AuthService {
             email: newUser.email,
             username: newUser.username,
             role: newUser.role,
+            isTwoFactorEnabled: newUser.isTwoFactorEnabled,
         } 
     }
 

@@ -78,6 +78,7 @@ describe('AuthService', () => {
             password: 'hashed_password_123',
             confirmed: false,
             phoneNumber: null,
+            isTwoFactorEnabled: false,
         }
 
 
@@ -112,6 +113,7 @@ describe('AuthService', () => {
                 email: VALID_DTO.email,
                 username: 'rodrichc',
                 role: 'USER',
+                isTwoFactorEnabled: false,
             })
 
             // Verificar que NO incluye la contraseña en el retorno

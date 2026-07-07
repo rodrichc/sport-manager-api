@@ -33,6 +33,7 @@ describe('ComplexService', () => {
         email: 'owner@test.com',
         username: 'ownertest',
         role: 'OWNER',
+        isTwoFactorEnabled: false,
     }
 
     const REGULAR_USER: UserSafe = {
@@ -41,6 +42,7 @@ describe('ComplexService', () => {
         email: 'user@test.com',
         username: 'usertest',
         role: 'USER',
+        isTwoFactorEnabled: false,
     }
 
     const ADMIN_USER: UserSafe = {
@@ -49,6 +51,7 @@ describe('ComplexService', () => {
         email: 'admin@test.com',
         username: 'admin',
         role: 'ADMIN',
+        isTwoFactorEnabled: false,
     }
 
     const OTHER_OWNER: UserSafe = {
@@ -57,6 +60,7 @@ describe('ComplexService', () => {
         email: 'otro@test.com',
         username: 'otroowner',
         role: 'OWNER',
+        isTwoFactorEnabled: false,
     }
 
     // ── Complejo de prueba ────────────────────────────────
