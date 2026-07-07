@@ -244,4 +244,37 @@ describe.skip('Booking API Integration', () => {
         expect(Array.isArray(response.body.data)).toBe(true)
         expect(response.body.data.length).toBe(0)
     })
+
+    it('POST /bookings - Should allow booking if colliding pending booking is expired', async () => {
+        const lazyStart = addDays(new Date(TEST_START), 14).toISOString()
+        const lazyEnd = addDays(new Date(TEST_END), 14).toISOString()
+        
+        // 1. Create a pending booking manually using Prisma with an old creation date
+        await prisma.booking.create({
+            data: {
+                userId: userId,
+                courtId: courtId,
+                startTime: new Date(lazyStart),
+                endTime: new Date(lazyEnd),
+                totalPrice: 2000,
+                status: 'PENDING',
+                createdAt: new Date(Date.now() - 20 * 60 * 1000) // 20 minutes ago
+            }
+        });
+
+        // 2. Try to book the same slot via API
+        const response = await request(app)
+            .post('/api/v1/bookings')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                courtId: courtId,
+                startTime: lazyStart,
+                endTime: lazyEnd,
+            });
+
+        // Should succeed because the previous one is PENDING and expired
+        expect(response.status).toBe(201)
+        expect(response.body.data).toHaveProperty('id')
+        expect(response.body.data.status).toBe('CONFIRMED')
+    })
 })
