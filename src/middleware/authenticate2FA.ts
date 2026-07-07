@@ -44,7 +44,8 @@ export const authenticate2FA = async(req: Request, res: Response, next: NextFunc
                     name: true,
                     username: true,
                     email: true,
-                    role: true
+                    role: true,
+                    isTwoFactorEnabled: true
                 }
             })
 

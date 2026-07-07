@@ -44,7 +44,8 @@ export const authenticate = async(req: Request, res: Response, next: NextFunctio
                     name: true,
                     username: true,
                     email: true,
-                    role: true
+                    role: true,
+                    isTwoFactorEnabled: true
                 }
             })
 
