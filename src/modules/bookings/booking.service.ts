@@ -8,9 +8,14 @@ import { CreateBookingDTO } from "./booking.types"
 import { UserId } from "../../types"
 import type { PaginatedResponse, PaginationQuery } from "../../types/pagination"
 
+import { PaymentService } from "../payments/payment.service"
+
 export class BookingService {
 
-    constructor(private readonly bookingRepository: BookingRepository) { }
+    constructor(
+        private readonly bookingRepository: BookingRepository,
+        private readonly paymentService: PaymentService
+    ) { }
 
     async create(userId: UserId, data: CreateBookingDTO) {
         const COMPLEX_TIMEZONE = process.env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires'
@@ -106,7 +111,17 @@ export class BookingService {
                 totalPrice
             })
 
-            return newBooking;
+            const payment = await this.paymentService.createPaymentIntention(
+                 newBooking.id, 
+                 newBooking.courtId, 
+                 `Reserva en cancha ${court.name || 'Padel'}`, 
+                 totalPrice
+            );
+
+            return {
+                ...newBooking,
+                paymentInitPoint: payment.initPoint
+            };
 
         } catch (error: any) {
             if (error.message === "COLLISION_DETECTED") {

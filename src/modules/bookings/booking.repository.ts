@@ -11,7 +11,7 @@ export class BookingRepository {
 
         return await db.$transaction(async (tx) => {
 
-            const busy = await tx.booking.findFirst({
+            const activeCollisions = await tx.booking.findMany({
                 where: {
                     courtId: data.courtId,
                     status: { not: BookingStatus.CANCELLED },
@@ -22,7 +22,19 @@ export class BookingRepository {
                 }
             })
 
-            if (busy) {
+            for (const collision of activeCollisions) {
+                if (collision.status === BookingStatus.PENDING) {
+                    const EXPIRATION_MINUTES = 10;
+                    const isExpired = new Date().getTime() - collision.createdAt.getTime() > EXPIRATION_MINUTES * 60000;
+                    
+                    if (isExpired) {
+                        await tx.booking.update({
+                            where: { id: collision.id },
+                            data: { status: BookingStatus.CANCELLED }
+                        })
+                        continue;
+                    }
+                }
                 throw new Error("COLLISION_DETECTED")
             }
 
@@ -33,7 +45,7 @@ export class BookingRepository {
                     startTime: data.startTime,
                     endTime: data.endTime,
                     totalPrice: data.totalPrice,
-                    status: BookingStatus.CONFIRMED
+                    status: BookingStatus.PENDING
                 }
             })
         })
@@ -42,7 +54,7 @@ export class BookingRepository {
     async getCourtPrice(courtId: CourtId) {
         return await db.court.findUnique({
             where: { id: courtId },
-            select: { price: true, complexId: true, isActive: true }
+            select: { name: true, price: true, complexId: true, isActive: true }
         })
     }
 
