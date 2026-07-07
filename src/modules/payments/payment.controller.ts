@@ -6,10 +6,11 @@ export class PaymentController {
 
     webhook = async (req: Request, res: Response) => {
         try {
-            const { type, data } = req.body;
+            const type = req.body?.type || req.query?.type;
+            const dataId = req.body?.data?.id || req.query?.['data.id'];
 
-            if (type === 'payment' && data && data.id) {
-                await this.paymentService.processWebhook(data.id);
+            if (type === 'payment' && dataId) {
+                await this.paymentService.processWebhook(dataId as string);
             }
 
             res.status(200).send("OK");
