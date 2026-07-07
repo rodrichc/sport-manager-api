@@ -58,6 +58,10 @@
  *           format: double
  *           description: Precio total calculado de la reserva
  *           example: 15000
+ *         paymentUrl:
+ *           type: string
+ *           description: URL de MercadoPago para abonar la reserva (si aplica)
+ *           example: "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=..."
  *         status:
  *           type: string
  *           enum:
