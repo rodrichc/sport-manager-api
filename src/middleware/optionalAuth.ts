@@ -37,7 +37,8 @@ export const optionalAuthenticate = async(req: Request, res: Response, next: Nex
                     name: true,
                     username: true,
                     email: true,
-                    role: true
+                    role: true,
+                    isTwoFactorEnabled: true
                 }
             })
 
