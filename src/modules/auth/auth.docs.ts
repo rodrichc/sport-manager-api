@@ -155,12 +155,24 @@
  *             $ref: '#/components/schemas/LoginDTO'
  *     responses:
  *       200:
- *         description: Login exitoso — retorna token JWT como string
+ *         description: Login exitoso. Si el usuario tiene 2FA activado, devuelve un token temporal y un flag. Si no, devuelve el token definitivo.
  *         content:
- *           text/html:
+ *           application/json:
  *             schema:
- *               type: string
- *               example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *               oneOf:
+ *                 - type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                 - type: object
+ *                   properties:
+ *                     tempToken:
+ *                       type: string
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                     is2faRequired:
+ *                       type: boolean
+ *                       example: true
  *       400:
  *         description: Datos inválidos o faltantes
  *         content:
