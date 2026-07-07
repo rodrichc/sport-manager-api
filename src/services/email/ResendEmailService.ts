@@ -13,7 +13,7 @@ export class ResendEmailService implements IEmailService {
     }
 
     async sendVerificationEmail(email: string, token: string): Promise<void> {
-        const confirmLink = `${this.baseUrl}/auth/confirm-account?token=${token}`
+        const confirmLink = `${this.baseUrl}/verify-email?token=${token}`
         
         console.log(`[DEV MODE] 📧 Email de Confirmación enviado a ${email}: ${confirmLink}`)
         
@@ -26,7 +26,7 @@ export class ResendEmailService implements IEmailService {
     }
 
     async sendPasswordResetEmail(email: string, token: string): Promise<void> {
-        const resetLink = `${this.baseUrl}/auth/new-password?token=${token}`
+        const resetLink = `${this.baseUrl}/reset-password?token=${token}`
         
         console.log(`[DEV MODE] 📧 Email de Reseteo enviado a ${email}: ${resetLink}`)
 
