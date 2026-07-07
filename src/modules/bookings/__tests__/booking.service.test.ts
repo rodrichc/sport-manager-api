@@ -16,6 +16,11 @@ const mockRepository: jest.Mocked<BookingRepository> = {
     findBookingsInRange: jest.fn(),
 } as unknown as jest.Mocked<BookingRepository>
 
+const mockPaymentService = {
+    createPaymentIntention: jest.fn(),
+    processWebhook: jest.fn(),
+} as any
+
 describe('BookingService – create()', () => {
 
     let service: BookingService
@@ -64,9 +69,10 @@ describe('BookingService – create()', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-        service = new BookingService(mockRepository)
+        service = new BookingService(mockRepository, mockPaymentService)
 
         // Setup por defecto: todo válido
+        mockPaymentService.createPaymentIntention.mockResolvedValue({ initPoint: 'http://mercadopago.com/init' })
         mockRepository.getCourtPrice.mockResolvedValue(FAKE_COURT as any)
         mockRepository.getComplexConfig.mockResolvedValue(FAKE_COMPLEX_CONFIG as any)
         mockRepository.getComplexSchedule.mockResolvedValue(FAKE_SCHEDULE as any)
@@ -98,8 +104,8 @@ describe('BookingService – create()', () => {
             })
         )
 
-        // Verificar que devuelve la reserva
-        expect(result).toEqual(FAKE_BOOKING)
+        // Verificar que devuelve la reserva con el initPoint
+        expect(result).toEqual({ ...FAKE_BOOKING, paymentInitPoint: 'http://mercadopago.com/init' })
     })
 
 

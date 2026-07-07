@@ -7,14 +7,14 @@ import { MercadoPagoConfig, Payment, Preference } from 'mercadopago'
 jest.mock('mercadopago', () => {
     return {
         MercadoPagoConfig: jest.fn(),
-        Preference: jest.fn().mockImplementation(() => ({
-            create: jest.fn().mockResolvedValue({
+        Preference: class {
+            create = jest.fn().mockResolvedValue({
                 id: 'mock_pref_id',
                 init_point: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=mock_pref_id'
             })
-        })),
-        Payment: jest.fn().mockImplementation(() => ({
-            get: jest.fn().mockImplementation(async ({ id }) => {
+        },
+        Payment: class {
+            get = jest.fn().mockImplementation(async ({ id }) => {
                 if (id === 'approved_id') {
                     return {
                         status: 'approved',
@@ -32,7 +32,7 @@ jest.mock('mercadopago', () => {
                 }
                 return null;
             })
-        }))
+        }
     }
 })
 

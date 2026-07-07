@@ -33,6 +33,8 @@ const mockRepository: jest.Mocked<AuthRepository> = {
     findUserForUsername: jest.fn(),
     createUser: jest.fn(),
     updateToOwner: jest.fn(),
+    deleteTokensByUser: jest.fn(),
+    createToken: jest.fn(),
 } as unknown as jest.Mocked<AuthRepository>
 
 
@@ -74,13 +76,13 @@ describe('AuthService', () => {
             username: 'rodrichc',
             role: 'USER',
             password: 'hashed_password_123',
-            confirmed: true,
+            confirmed: false,
             phoneNumber: null,
         }
 
 
         it('debe crear una cuenta exitosamente y retornar el usuario sin la contraseña', async () => {
-            mockRepository.findUserForEmail.mockResolvedValue(null)
+            mockRepository.findUserForEmail.mockResolvedValueOnce(null).mockResolvedValueOnce(CREATED_USER as any)
             mockRepository.findUserForUsername.mockResolvedValue(null)
             mockRepository.createUser.mockResolvedValue(CREATED_USER as any)
 
@@ -185,7 +187,7 @@ describe('AuthService', () => {
                 phoneNumber: '1155667788',
             }
 
-            mockRepository.findUserForEmail.mockResolvedValue(null)
+            mockRepository.findUserForEmail.mockResolvedValueOnce(null).mockResolvedValueOnce(createdOwner as any)
             mockRepository.findUserForUsername.mockResolvedValue(null)
             mockRepository.createUser.mockResolvedValue(createdOwner as any)
 

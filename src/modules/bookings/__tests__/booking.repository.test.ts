@@ -62,11 +62,11 @@ describe('BookingRepository – create()', () => {
     // ═════════════════════════════════════════════════════════
     //  ESCENARIO 1: Creación Exitosa (horario libre)
     // ═════════════════════════════════════════════════════════
-    it('debe crear la reserva cuando el horario está libre (findFirst → null)', async () => {
+    it('debe crear la reserva cuando el horario está libre (findMany → [])', async () => {
         // Simulamos que $transaction ejecuta el callback con un "tx" mockeado
         const mockTx = {
             booking: {
-                findFirst: jest.fn().mockResolvedValue(null),       // ← horario libre
+                findMany: jest.fn().mockResolvedValue([]),       // ← horario libre
                 create: jest.fn().mockResolvedValue(FAKE_BOOKING),  // ← crea ok
             },
         };
@@ -81,8 +81,8 @@ describe('BookingRepository – create()', () => {
 
         // ── Verificaciones ──────────────────────────────────
         // 1. Se verificó la disponibilidad con los filtros correctos
-        expect(mockTx.booking.findFirst).toHaveBeenCalledTimes(1)
-        expect(mockTx.booking.findFirst).toHaveBeenCalledWith({
+        expect(mockTx.booking.findMany).toHaveBeenCalledTimes(1)
+        expect(mockTx.booking.findMany).toHaveBeenCalledWith({
             where: {
                 courtId: INPUT_DATA.courtId,
                 status: { not: BookingStatus.CANCELLED },
@@ -102,7 +102,7 @@ describe('BookingRepository – create()', () => {
                 startTime: INPUT_DATA.startTime,
                 endTime: INPUT_DATA.endTime,
                 totalPrice: INPUT_DATA.totalPrice,
-                status: BookingStatus.CONFIRMED,
+                status: BookingStatus.PENDING,
             },
         })
 
@@ -126,7 +126,7 @@ describe('BookingRepository – create()', () => {
 
         const mockTx = {
             booking: {
-                findFirst: jest.fn().mockResolvedValue(existingBooking),  // ← ocupado
+                findMany: jest.fn().mockResolvedValue([existingBooking]),  // ← ocupado
                 create: jest.fn(),
             },
         };
@@ -143,8 +143,8 @@ describe('BookingRepository – create()', () => {
             .rejects
             .toThrow('COLLISION_DETECTED')
 
-        // 2. findFirst SÍ fue llamado (verificó disponibilidad)
-        expect(mockTx.booking.findFirst).toHaveBeenCalledTimes(1)
+        // 2. findMany SÍ fue llamado (verificó disponibilidad)
+        expect(mockTx.booking.findMany).toHaveBeenCalledTimes(1)
 
         // 3. create NUNCA fue llamado (se abortó antes)
         expect(mockTx.booking.create).not.toHaveBeenCalled()
@@ -167,7 +167,7 @@ describe('BookingRepository – create()', () => {
 
         const mockTx = {
             booking: {
-                findFirst: jest.fn().mockResolvedValue(partialOverlap),
+                findMany: jest.fn().mockResolvedValue([partialOverlap]),
                 create: jest.fn(),
             },
         };
@@ -189,11 +189,11 @@ describe('BookingRepository – create()', () => {
     // ═════════════════════════════════════════════════════════
     //  ESCENARIO 4: Reserva cancelada no genera colisión
     // ═════════════════════════════════════════════════════════
-    it('no debe considerar reservas CANCELLED como colisión (findFirst filtra por status)', async () => {
-        // findFirst retorna null porque la query excluye CANCELLED
+    it('no debe considerar reservas CANCELLED como colisión (findMany filtra por status)', async () => {
+        // findMany retorna [] porque la query excluye CANCELLED
         const mockTx = {
             booking: {
-                findFirst: jest.fn().mockResolvedValue(null),
+                findMany: jest.fn().mockResolvedValue([]),
                 create: jest.fn().mockResolvedValue(FAKE_BOOKING),
             },
         };
@@ -207,7 +207,7 @@ describe('BookingRepository – create()', () => {
         await repository.create(INPUT_DATA)
 
         // Verificamos que el filtro excluye CANCELLED
-        expect(mockTx.booking.findFirst).toHaveBeenCalledWith(
+        expect(mockTx.booking.findMany).toHaveBeenCalledWith(
             expect.objectContaining({
                 where: expect.objectContaining({
                     status: { not: BookingStatus.CANCELLED },
