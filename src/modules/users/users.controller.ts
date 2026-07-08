@@ -1,4 +1,5 @@
 import { Request, Response } from "express"
+import { matchedData } from "express-validator"
 import { UsersService } from "./users.service"
 import { catchAsync } from "../../utils/catchAsync"
 
@@ -10,7 +11,8 @@ export class UsersController {
     }
 
     updateProfile = catchAsync(async (req: Request, res: Response) => {
-        const updatedUser = await this.usersService.updateProfile(req.user.id, req.body)
+        const validData = matchedData(req, { locations: ['body'] });
+        const updatedUser = await this.usersService.updateProfile(req.user.id, validData)
         res.json({ message: 'Perfil actualizado', data: updatedUser })
     })
 
