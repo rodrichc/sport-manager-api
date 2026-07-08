@@ -1,14 +1,3 @@
-import crypto from "crypto"
-import { TOTP, NobleCryptoPlugin, ScureBase32Plugin } from "otplib"
-
-function getTotp(email: string = 'user') {
-    return new TOTP({
-        issuer: 'SportManager',
-        label: email,
-        crypto: new NobleCryptoPlugin(),
-        base32: new ScureBase32Plugin()
-    });
-}
 import { TokenType } from "@prisma/client"
 import { IEmailService } from "../../services/email/IEmailService"
 import { ResendEmailService } from "../../services/email/ResendEmailService"
@@ -19,6 +8,8 @@ import { AppError } from "../../utils/appError"
 import { generateJWT } from "../../utils/jwt"
 import { UserSafe } from "../../types"
 import { createUsername } from "../../utils/slugify"
+import { getTotp } from "../../utils/totp"
+import { generateToken } from "../../utils/crypto"
 
 const emailService: IEmailService = new ResendEmailService()
 
@@ -94,17 +85,13 @@ export class AuthService {
         return await this.authRepository.updateToOwner(user.id, phoneNumber)
     }
 
-    async generateToken(): Promise<string> {
-        return crypto.randomBytes(32).toString('hex')
-    }
-
     async sendVerification(email: string) {
         const user = await this.authRepository.findUserForEmail(email)
         if(!user) throw new AppError('Usuario no encontrado', 404)
         if(user.confirmed) throw new AppError('La cuenta ya está confirmada', 400)
 
         await this.authRepository.deleteTokensByUser(user.id, 'EMAIL_VERIFICATION')
-        const token = await this.generateToken()
+        const token = await generateToken()
         const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24) // 24hs
         await this.authRepository.createToken(user.id, token, 'EMAIL_VERIFICATION', expiresAt)
         await emailService.sendVerificationEmail(user.email, token)
@@ -123,7 +110,7 @@ export class AuthService {
         if(!user) throw new AppError('Usuario no encontrado', 404)
 
         await this.authRepository.deleteTokensByUser(user.id, 'PASSWORD_RESET')
-        const token = await this.generateToken()
+        const token = await generateToken()
         const expiresAt = new Date(Date.now() + 1000 * 60 * 60) // 1h
         await this.authRepository.createToken(user.id, token, 'PASSWORD_RESET', expiresAt)
         await emailService.sendPasswordResetEmail(user.email, token)
