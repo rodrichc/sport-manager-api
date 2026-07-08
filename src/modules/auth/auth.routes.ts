@@ -11,6 +11,7 @@ import {
     validate2FACode 
 } from "./auth.validator"
 import { authController } from "./auth.dependencies"
+import { limiter } from "../../middleware/rateLimiter"
 
 const router = Router()
 
@@ -28,6 +29,6 @@ router.post('/reset-password', validateResetPassword, authController.resetPasswo
 router.get('/2fa/generate', authenticate, authController.generate2FA)
 router.post('/2fa/enable', authenticate, validate2FACode, authController.enable2FA)
 // Assumes tempToken is sent via Authorization header
-router.post('/2fa/verify', authenticate2FA, validate2FACode, authController.verify2FA)
+router.post('/2fa/verify', limiter, authenticate2FA, validate2FACode, authController.verify2FA)
 
 export default router
