@@ -1,0 +1,2779 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sport Manager API",
+    "version": "1.0.0",
+    "description": "API RESTful para gestión de reservas y canchas"
+  },
+  "servers": [
+    {
+      "url": "undefined/api/v1",
+      "description": "Servidor Local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "CreateAccountDTO": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "username",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Juan Pérez"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "juan@email.com"
+          },
+          "username": {
+            "type": "string",
+            "example": "juanperez"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "password123"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "OWNER"
+            ],
+            "default": "USER",
+            "description": "Si el rol es OWNER, phoneNumber es obligatorio"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Obligatorio cuando role es OWNER",
+            "example": "3511234567"
+          }
+        }
+      },
+      "UserSafe": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Juan Pérez"
+          },
+          "email": {
+            "type": "string",
+            "example": "juan@email.com"
+          },
+          "username": {
+            "type": "string",
+            "example": "juanperez"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "OWNER",
+              "ADMIN"
+            ],
+            "example": "USER"
+          }
+        }
+      },
+      "LoginDTO": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "juan@email.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "password123"
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "field"
+                },
+                "msg": {
+                  "type": "string",
+                  "example": "El Nombre es obligatorio"
+                },
+                "path": {
+                  "type": "string",
+                  "example": "name"
+                },
+                "location": {
+                  "type": "string",
+                  "example": "body"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateBookingDTO": {
+        "type": "object",
+        "required": [
+          "courtId",
+          "startTime",
+          "endTime"
+        ],
+        "properties": {
+          "courtId": {
+            "type": "integer",
+            "description": "ID de la cancha a reservar",
+            "example": 3
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Hora de inicio en formato ISO 8601 UTC (con sufijo 'Z'). Ejemplo: 2026-01-05T21:00:00Z\n",
+            "example": "2026-07-10T18:00:00Z"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Hora de fin en formato ISO 8601 UTC (con sufijo 'Z'). Ejemplo: 2026-01-05T22:00:00Z\n",
+            "example": "2026-07-10T19:00:00Z"
+          }
+        }
+      },
+      "BookingResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID único de la reserva",
+            "example": 42
+          },
+          "userId": {
+            "type": "integer",
+            "description": "ID del usuario que realizó la reserva",
+            "example": 7
+          },
+          "courtId": {
+            "type": "integer",
+            "description": "ID de la cancha reservada",
+            "example": 3
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Hora de inicio de la reserva (UTC)",
+            "example": "2026-07-10T18:00:00.000Z"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Hora de fin de la reserva (UTC)",
+            "example": "2026-07-10T19:00:00.000Z"
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "double",
+            "description": "Precio total calculado de la reserva",
+            "example": 15000
+          },
+          "paymentUrl": {
+            "type": "string",
+            "description": "URL de MercadoPago para abonar la reserva (si aplica)",
+            "example": "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=..."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "CANCELLED",
+              "COMPLETED"
+            ],
+            "description": "Estado actual de la reserva",
+            "example": "CONFIRMED"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de creación del registro",
+            "example": "2026-07-10T17:55:30.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de última actualización del registro",
+            "example": "2026-07-10T17:55:30.000Z"
+          }
+        }
+      },
+      "ScheduleInput": {
+        "type": "object",
+        "required": [
+          "dayOfWeek",
+          "startTime",
+          "endTime"
+        ],
+        "properties": {
+          "dayOfWeek": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6,
+            "description": "Día de la semana (0 = Domingo, 6 = Sábado)",
+            "example": 1
+          },
+          "startTime": {
+            "type": "string",
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+            "description": "Hora de apertura en formato HH:MM",
+            "example": "09:00"
+          },
+          "endTime": {
+            "type": "string",
+            "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$",
+            "description": "Hora de cierre en formato HH:MM",
+            "example": "23:00"
+          }
+        }
+      },
+      "ScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "dayOfWeek": {
+            "type": "integer",
+            "example": 1
+          },
+          "startTime": {
+            "type": "string",
+            "example": "09:00"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "23:00"
+          },
+          "complexId": {
+            "type": "integer",
+            "example": 5
+          }
+        }
+      },
+      "CreateComplexDTO": {
+        "type": "object",
+        "required": [
+          "name",
+          "address",
+          "schedules"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Complejo El Gigante"
+          },
+          "address": {
+            "type": "string",
+            "example": "Av. Colón 1234, Córdoba"
+          },
+          "schedules": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ScheduleInput"
+            }
+          }
+        }
+      },
+      "UpdateComplexDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Complejo Renovado"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 150,
+            "example": "El mejor complejo deportivo de la zona"
+          },
+          "address": {
+            "type": "string",
+            "example": "Av. Colón 5678, Córdoba"
+          },
+          "lat": {
+            "type": "number",
+            "format": "float",
+            "minimum": -90,
+            "maximum": 90,
+            "example": -31.4201
+          },
+          "lng": {
+            "type": "number",
+            "format": "float",
+            "minimum": -180,
+            "maximum": 180,
+            "example": -64.1888
+          },
+          "logo": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://cdn.example.com/logo.png"
+          }
+        }
+      },
+      "ComplexResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 5
+          },
+          "name": {
+            "type": "string",
+            "example": "Complejo El Gigante"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "El mejor complejo deportivo de la zona"
+          },
+          "address": {
+            "type": "string",
+            "example": "Av. Colón 1234, Córdoba"
+          },
+          "lat": {
+            "type": "number",
+            "nullable": true,
+            "example": -31.4201
+          },
+          "lng": {
+            "type": "number",
+            "nullable": true,
+            "example": -64.1888
+          },
+          "logo": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "example": "PENDING"
+          },
+          "ownerId": {
+            "type": "integer",
+            "example": 7
+          },
+          "minBookingDuration": {
+            "type": "integer",
+            "example": 60
+          },
+          "maxBookingDuration": {
+            "type": "integer",
+            "example": 180
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-10T14:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-10T14:30:00.000Z"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": null
+          }
+        }
+      },
+      "ComplexWithSchedules": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ComplexResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "schedules": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ScheduleResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CourtResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "example": "Cancha 1"
+          },
+          "sport": {
+            "type": "string",
+            "example": "fútbol"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true,
+            "example": "5v5"
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "example": 15000
+          },
+          "duration": {
+            "type": "integer",
+            "example": 60
+          },
+          "isIndoor": {
+            "type": "boolean",
+            "example": false
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "complexId": {
+            "type": "integer",
+            "example": 5
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-10T14:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-10T14:30:00.000Z"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": null
+          }
+        }
+      },
+      "CreateCourtDTO": {
+        "type": "object",
+        "required": [
+          "name",
+          "sport",
+          "complexId",
+          "price"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre de la cancha",
+            "example": "Cancha 1"
+          },
+          "sport": {
+            "type": "string",
+            "description": "Deporte principal de la cancha",
+            "example": "fútbol"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true,
+            "description": "Tipo o modalidad (ej. 5v5, 7v7)",
+            "example": "5v5"
+          },
+          "complexId": {
+            "type": "integer",
+            "description": "ID del complejo al que pertenece",
+            "example": 5
+          },
+          "price": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0,
+            "description": "Precio por hora",
+            "example": 15000
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duración por defecto del turno en minutos",
+            "default": 60,
+            "example": 60
+          },
+          "isIndoor": {
+            "type": "boolean",
+            "description": "Si la cancha es techada",
+            "default": false,
+            "example": false
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Si la cancha está activa para recibir reservas",
+            "default": true,
+            "example": true
+          }
+        }
+      },
+      "CreateReviewDTO": {
+        "type": "object",
+        "required": [
+          "rating"
+        ],
+        "properties": {
+          "rating": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "example": 5
+          },
+          "comment": {
+            "type": "string",
+            "example": "Excelente complejo, muy buenas canchas."
+          }
+        }
+      },
+      "ReviewResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "rating": {
+            "type": "integer",
+            "example": 5
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true,
+            "example": "Excelente complejo, muy buenas canchas."
+          },
+          "userId": {
+            "type": "integer",
+            "example": 1
+          },
+          "complexId": {
+            "type": "integer",
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-07-06T14:30:00.000Z"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "name": {
+                "type": "string",
+                "example": "Juan Perez"
+              },
+              "avatar": {
+                "type": "string",
+                "nullable": true,
+                "example": "https://example.com/avatar.jpg"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Crear una nueva cuenta de usuario",
+        "description": "Registra un usuario con rol USER u OWNER. Si el rol es OWNER, el campo phoneNumber es obligatorio.\n",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario creado correctamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserSafe"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o faltantes (ej. OWNER sin phoneNumber)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "El email o username ya está registrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "El email ya está en uso"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Iniciar sesión",
+        "description": "Autentica al usuario y retorna un token JWT como string plano. El token tiene una expiración de 180 días.\n",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso — retorna token JWT como string",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o faltantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Contraseña incorrecta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Contraseña incorrecta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "El usuario no existe"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/user": {
+      "get": {
+        "summary": "Obtener perfil del usuario autenticado",
+        "description": "Retorna los datos del usuario extraídos del token JWT (sin password).",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil recuperado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSafe"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          }
+        }
+      }
+    },
+    "/auth/become-owner": {
+      "post": {
+        "summary": "Actualizar rol a OWNER (Propietario)",
+        "description": "Convierte al usuario autenticado en dueño de complejos. Requiere un número de teléfono de contacto.\n",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "phoneNumber"
+                ],
+                "properties": {
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "Teléfono de contacto obligatorio para ser dueño",
+                    "example": "35111223344"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rol actualizado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Felicitaciones, ahora podes administrar tus complejos deportivos."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ya es dueño o falta phoneNumber",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Ya sos dueño"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          }
+        }
+      }
+    },
+    "/auth/send-verification": {
+      "post": {
+        "summary": "Enviar email de verificación",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email enviado"
+          }
+        }
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "summary": "Verificar email",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verificado correctamente"
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Olvidé mi contraseña",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email enviado"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "summary": "Restablecer contraseña",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contraseña restablecida"
+          }
+        }
+      }
+    },
+    "/auth/2fa/generate": {
+      "get": {
+        "summary": "Generar código QR para 2FA",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Código QR generado"
+          }
+        }
+      }
+    },
+    "/auth/2fa/enable": {
+      "post": {
+        "summary": "Habilitar 2FA",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "2FA habilitado"
+          }
+        }
+      }
+    },
+    "/auth/2fa/verify": {
+      "post": {
+        "summary": "Verificar 2FA y obtener token final",
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token generado"
+          }
+        }
+      }
+    },
+    "/bookings": {
+      "post": {
+        "summary": "Crear una reserva",
+        "description": "Crea una nueva reserva para una cancha en el rango horario indicado. El backend valida disponibilidad, horarios del complejo, y duración permitida antes de confirmar la reserva.\n",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Reserva creada con éxito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Reserva creada con éxito"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BookingResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación de inputs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "example": "field"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "example": "La hora de inicio es obligatoria"
+                          },
+                          "path": {
+                            "type": "string",
+                            "example": "startTime"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "body"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto — el turno ya se encuentra ocupado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "La cancha ya fue reservada por otro usuario dentro de ese horario"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bookings/my-bookings": {
+      "get": {
+        "summary": "Obtener historial de reservas",
+        "description": "Lista todas las reservas realizadas por el usuario autenticado, ordenadas por fecha de inicio de manera descendente (las más recientes primero). Incluye información detallada de la cancha y el complejo deportivo.\n",
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial de reservas obtenido con éxito (puede estar vacío)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/BookingResponse"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "court": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer",
+                                    "example": 1
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "Cancha 1"
+                                  },
+                                  "sport": {
+                                    "type": "string",
+                                    "example": "fútbol 5"
+                                  },
+                                  "complex": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "integer",
+                                        "example": 1
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "example": "Complejo El Trébol"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Token ausente o inválido"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/complexes": {
+      "post": {
+        "summary": "Crear un complejo deportivo",
+        "description": "Crea un nuevo complejo con sus horarios de atención. Solo usuarios con rol OWNER pueden crear complejos. El complejo se crea con status PENDING hasta ser aprobado por un ADMIN.\n",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateComplexDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Complejo creado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Complejo creado correctamente."
+                    },
+                    "newComplex": {
+                      "$ref": "#/components/schemas/ComplexWithSchedules"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o faltantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "El usuario no tiene rol OWNER",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Debe tener una cuenta de tipo Dueño para crear un Complejo"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar todos los complejos activos",
+        "description": "Retorna todos los complejos con status APPROVED y sin soft-delete. No requiere autenticación obligatoria (usa autenticación opcional).\n",
+        "tags": [
+          "Complexes"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de complejos activos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ComplexResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/complexes/my-complexes": {
+      "get": {
+        "summary": "Obtener mis complejos activos",
+        "description": "Retorna los complejos activos (no eliminados) del usuario autenticado, incluyendo sus horarios.",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de complejos activos del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ComplexWithSchedules"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          }
+        }
+      }
+    },
+    "/complexes/my-deleted": {
+      "get": {
+        "summary": "Obtener mis complejos eliminados",
+        "description": "Retorna los complejos con soft-delete del usuario autenticado.",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de complejos eliminados del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ComplexResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          }
+        }
+      }
+    },
+    "/complexes/{id}": {
+      "patch": {
+        "summary": "Actualizar un complejo",
+        "description": "Actualiza parcialmente los datos de un complejo. Solo el dueño del complejo o un ADMIN pueden realizarlo.\n",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 5
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateComplexDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Complejo actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplexResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Acción no válida. No eres dueño de este complejo."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Complejo no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Complejo no encontrado"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar un complejo (soft delete)",
+        "description": "Marca el complejo como eliminado (soft delete). Solo el dueño o un ADMIN pueden realizarlo. El complejo puede ser restaurado posteriormente.\n",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complejo eliminado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Complejo eliminado correctamente."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Acción no válida. No eres dueño de este complejo."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Complejo no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Complejo no encontrado"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/complexes/{id}/restore": {
+      "patch": {
+        "summary": "Restaurar un complejo eliminado",
+        "description": "Restaura un complejo que fue previamente eliminado con soft delete. Solo el dueño o un ADMIN pueden realizarlo.\n",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complejo restaurado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Complejo restaurado correctamente"
+                    },
+                    "complex": {
+                      "$ref": "#/components/schemas/ComplexResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El complejo no está eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "El complejo no está eliminado"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo"
+          },
+          "404": {
+            "description": "Complejo no encontrado"
+          }
+        }
+      }
+    },
+    "/complexes/{id}/status": {
+      "patch": {
+        "summary": "Actualizar el estado de un complejo (Solo ADMIN)",
+        "description": "Permite a un administrador aprobar o rechazar un complejo. Solo usuarios con rol ADMIN pueden usar este endpoint.\n",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 5
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "APPROVED",
+                      "REJECTED"
+                    ],
+                    "example": "APPROVED"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estado actualizado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Estado actualizado correctamente."
+                    },
+                    "complex": {
+                      "$ref": "#/components/schemas/ComplexResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Status inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "Solo administradores pueden cambiar el estado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Acción no autorizada. Solo Administradores"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/complexes/{id}/schedules": {
+      "patch": {
+        "summary": "Actualizar horarios de un complejo",
+        "description": "Reemplaza todos los horarios del complejo. Elimina los horarios anteriores y crea los nuevos en una transacción. Solo el dueño o un ADMIN pueden realizarlo.\n",
+        "tags": [
+          "Complexes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 5
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "schedules"
+                ],
+                "properties": {
+                  "schedules": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/components/schemas/ScheduleInput"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Horarios actualizados correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Horarios actualizados correctamente."
+                    },
+                    "complex": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ScheduleResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de horarios inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo"
+          },
+          "404": {
+            "description": "Complejo no encontrado"
+          }
+        }
+      }
+    },
+    "/complexes/{id}/courts": {
+      "get": {
+        "summary": "Obtener canchas de un complejo",
+        "description": "Retorna todas las canchas activas (isActive=true, sin soft-delete) de un complejo específico. No requiere autenticación.\n",
+        "tags": [
+          "Complexes"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de canchas del complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CourtResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courts": {
+      "post": {
+        "summary": "Crear una cancha",
+        "description": "Crea una nueva cancha dentro de un complejo. El usuario autenticado debe ser el dueño del complejo indicado en complexId.\n",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCourtDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cancha creada con éxito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Cancha creada con éxito"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CourtResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o faltantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo indicado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No tenés permiso sobre este complejo"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar todas las canchas activas",
+        "description": "Retorna todas las canchas activas (isActive=true) y no eliminadas. No requiere autenticación.\n",
+        "tags": [
+          "Courts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de canchas activas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CourtResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontraron canchas activas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No se encontraron canchas activas"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courts/my-courts": {
+      "get": {
+        "summary": "Obtener mis canchas activas",
+        "description": "Retorna las canchas activas (no eliminadas) de los complejos del usuario autenticado. Incluye datos del complejo asociado.\n",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de canchas del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/CourtResponse"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "complex": {
+                                "$ref": "#/components/schemas/ComplexResponse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "404": {
+            "description": "No se encontraron canchas activas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No se encontraron canchas activas"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courts/my-deleted": {
+      "get": {
+        "summary": "Obtener mis canchas eliminadas",
+        "description": "Retorna las canchas con soft-delete de los complejos del usuario autenticado. Incluye datos del complejo asociado.\n",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de canchas eliminadas del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/CourtResponse"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "complex": {
+                                "$ref": "#/components/schemas/ComplexResponse"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "404": {
+            "description": "No se encontraron canchas en papelera",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No se encontraron canchas en papelera"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courts/{id}": {
+      "get": {
+        "summary": "Obtener una cancha por ID",
+        "description": "Retorna los datos de una cancha activa (isActive=true), incluyendo el complejo asociado. No requiere autenticación.\n",
+        "tags": [
+          "Courts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la cancha",
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancha encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/CourtResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "complex": {
+                          "$ref": "#/components/schemas/ComplexResponse"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe una cancha con este ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No existe un cancha con este ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Actualizar una cancha",
+        "description": "Actualiza los datos de una cancha existente. El usuario autenticado debe ser dueño del complejo al que pertenece la cancha.\n",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la cancha",
+            "example": 3
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCourtDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cancha actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourtResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No tenés permiso sobre este complejo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cancha no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Cancha inexistente."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar una cancha (soft delete)",
+        "description": "Marca la cancha como eliminada (soft delete) y la desactiva (isActive=false). El usuario autenticado debe ser dueño del complejo. La cancha puede ser restaurada posteriormente.\n",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la cancha",
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancha eliminada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Cancha eliminada correctamente."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo"
+          },
+          "404": {
+            "description": "Cancha no encontrada"
+          }
+        }
+      }
+    },
+    "/courts/{id}/restore": {
+      "patch": {
+        "summary": "Restaurar una cancha eliminada",
+        "description": "Restaura una cancha que fue eliminada con soft delete. La cancha queda con isActive=false — debe activarse manualmente después. El usuario autenticado debe ser dueño del complejo.\n",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la cancha",
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancha restaurada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Cancha restaurada correctamente"
+                    },
+                    "court": {
+                      "$ref": "#/components/schemas/CourtResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No tenés permiso sobre este complejo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontró la cancha en la papelera",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No se encontró la cancha en la papelera"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courts/{id}/force": {
+      "delete": {
+        "summary": "Eliminar una cancha permanentemente",
+        "description": "Elimina definitivamente una cancha de la base de datos. Solo se puede ejecutar sobre canchas que ya están en la papelera (soft-deleted). El usuario autenticado debe ser dueño del complejo.\n",
+        "tags": [
+          "Courts"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID de la cancha",
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancha eliminada permanentemente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Cancha eliminada correctamente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "No es dueño del complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No tenés permiso sobre este complejo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontró la cancha en la papelera",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No se encontró la cancha en la papelera"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/webhook": {
+      "post": {
+        "summary": "Webhook de MercadoPago",
+        "description": "Recibe notificaciones asíncronas de MercadoPago sobre el estado de un pago. Actualiza el estado de la reserva correspondiente a \"CONFIRMED\" si el pago fue aprobado, o la cancela/rechaza si el pago falló.\n",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tipo de notificación (e.g., payment)"
+          },
+          {
+            "in": "query",
+            "name": "data.id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID del pago en MercadoPago"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook procesado exitosamente"
+          },
+          "400": {
+            "description": "Parámetros inválidos o faltantes"
+          },
+          "500": {
+            "description": "Error interno al procesar el webhook"
+          }
+        }
+      }
+    },
+    "/complexes/{id}/reviews": {
+      "post": {
+        "summary": "Crear una reseña para un complejo",
+        "description": "Crea una reseña para un complejo. El usuario debe tener al menos una reserva con estado COMPLETED en este complejo.\n",
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Reseña creada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Reseña creada exitosamente."
+                    },
+                    "review": {
+                      "$ref": "#/components/schemas/ReviewResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o faltantes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado — token faltante o inválido"
+          },
+          "403": {
+            "description": "El usuario no tiene reservas completadas en el complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Debes tener al menos una reserva completada en este complejo para poder opinar."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Obtener reseñas de un complejo",
+        "description": "Retorna todas las reseñas de un complejo, ordenadas por fecha de creación (más recientes primero).\n",
+        "tags": [
+          "Reviews"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del complejo",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de reseñas del complejo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReviewResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "summary": "Obtener perfil del usuario autenticado",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil del usuario"
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    },
+    "/users/profile": {
+      "patch": {
+        "summary": "Actualizar perfil del usuario",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phoneNumber": {
+                    "type": "string"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil actualizado correctamente"
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    },
+    "/users/password": {
+      "patch": {
+        "summary": "Actualizar contraseña",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "currentPassword",
+                  "newPassword"
+                ],
+                "properties": {
+                  "currentPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contraseña actualizada"
+          },
+          "400": {
+            "description": "Contraseña actual incorrecta"
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Operaciones sobre perfiles de usuarios"
+    }
+  ]
+}
