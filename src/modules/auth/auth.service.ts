@@ -80,10 +80,10 @@ export class AuthService {
         if(!isPasswordCorrect) throw new AppError('Contraseña incorrecta', 403)
 
         if(user.isTwoFactorEnabled) {
-            return { tempToken: generateJWT({ id: user.id, isTemp: true }), is2faRequired: true }
+            return { tempToken: generateJWT({ id: user.id, isTemp: true }, process.env.JWT_2FA_SECRET, '3m'), is2faRequired: true }
         }
 
-        return { token: generateJWT({ id: user.id }) }
+        return { token: generateJWT({ id: user.id }, process.env.JWT_SECRET_KEY, '7d') }
     }
 
     async becomeOwner(user: UserSafe, phoneNumber: UserPhoneNumber) {
@@ -172,6 +172,6 @@ export class AuthService {
         const result = await totp.verify(code, { secret: user.twoFactorSecret })
         if(!result.valid) throw new AppError('Código inválido', 400)
 
-        return generateJWT({ id: user.id })
+        return generateJWT({ id: user.id }, process.env.JWT_SECRET_KEY, '7d')
     }
 }

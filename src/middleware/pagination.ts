@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 
-const DEFAULT_PAGE_SIZE = 10
-const MAX_PAGE_SIZE = 50
+const DEFAULT_PAGE_SIZE = 9
+const MAX_PAGE_SIZE = 45
 
 export const parsePagination = (req: Request, _res: Response, next: NextFunction) => {
     const rawPage = req.query.page
