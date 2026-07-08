@@ -29,11 +29,6 @@ export const authenticate = async(req: Request, res: Response, next: NextFunctio
     try {
         const result = jwt.verify(token, process.env.JWT_SECRET_KEY) as jwt.JwtPayload
 
-        if(result.isTemp) {
-            const error = new Error('Se requiere validación 2FA')
-            return res.status(401).json({error: error.message})
-        }
-
         if(typeof result === 'object' && result.id){
             const user = await db.user.findUnique({
                 where: { 

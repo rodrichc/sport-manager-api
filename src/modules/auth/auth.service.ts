@@ -80,7 +80,7 @@ export class AuthService {
         if(!isPasswordCorrect) throw new AppError('Contraseña incorrecta', 403)
 
         if(user.isTwoFactorEnabled) {
-            return { tempToken: generateJWT({ id: user.id, isTemp: true }, process.env.JWT_2FA_SECRET, '3m'), is2faRequired: true }
+            return { tempToken: generateJWT({ id: user.id }, process.env.JWT_2FA_SECRET, '3m'), is2faRequired: true }
         }
 
         return { token: generateJWT({ id: user.id }, process.env.JWT_SECRET_KEY, '7d') }

@@ -1,17 +1,17 @@
 import type { Request, Response, NextFunction } from "express"
 import jwt from 'jsonwebtoken'
 import { db } from "../config/db"
-import { UserSafe } from "../types"
+import { UserId } from "../types"
 
 declare global {
     namespace Express {
         interface Request {
-            user?: UserSafe
+            userId?: UserId
         }
     }
 }
 
-export const authenticate2FA = async(req: Request, res: Response, next: NextFunction) => {
+export const authenticate2FA= async(req: Request, res: Response, next: NextFunction) => {
     const bearer = req.headers.authorization
 
     if(!bearer){
@@ -27,37 +27,13 @@ export const authenticate2FA = async(req: Request, res: Response, next: NextFunc
     }
 
     try {
-        const result = jwt.verify(token, process.env.JWT_SECRET_KEY) as jwt.JwtPayload
-
-        if(!result.isTemp) {
-            const error = new Error('Token inválido para esta acción')
-            return res.status(401).json({error: error.message})
-        }
+        const result = jwt.verify(token, process.env.JWT_2FA_SECRET) as jwt.JwtPayload
 
         if(typeof result === 'object' && result.id){
-            const user = await db.user.findUnique({
-                where: { 
-                    id: result.id 
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    username: true,
-                    email: true,
-                    role: true,
-                    isTwoFactorEnabled: true
-                }
-            })
-
-            if(!user) {
-                const error = new Error('Usuario No Encontrado')
-                return res.status(404).json({error: error.message})
-            }
-
-            req.user = user
-
+            req.userId = result.id
             next()
         }
+        
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
             return res.status(401).json({error: 'Token No Válido'})

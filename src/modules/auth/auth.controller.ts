@@ -66,7 +66,7 @@ export class AuthController {
     })
 
     verify2FA = catchAsync(async (req: Request, res: Response) => {
-        const token = await this.authService.verify2FA(req.user.id, req.body.code)
+        const token = await this.authService.verify2FA(req.userId, req.body.code)
         res.json({ token })
     })
 }
