@@ -1,15 +1,14 @@
-import { TokenType } from "@prisma/client"
 import { IEmailService } from "../../services/email/IEmailService"
 import { ResendEmailService } from "../../services/email/ResendEmailService"
 import { AuthRepository } from "./auth.repository"
 import { CreateAccountDTO, LoginDTO, UserPhoneNumber } from "./auth.types"
+import { UserSafe } from "../../types"
 import { checkPassword, hashPassword } from "../../utils/auth"
 import { AppError } from "../../utils/appError"
 import { generateJWT } from "../../utils/jwt"
-import { UserSafe } from "../../types"
 import { createUsername } from "../../utils/slugify"
 import { getTotp } from "../../utils/totp"
-import { generateToken } from "../../utils/crypto"
+import { decryptData, generateEncrypted, generateHashedToken, generateToken } from "../../utils/crypto"
 
 const emailService: IEmailService = new ResendEmailService()
 
@@ -92,13 +91,15 @@ export class AuthService {
 
         await this.authRepository.deleteTokensByUser(user.id, 'EMAIL_VERIFICATION')
         const token = await generateToken()
+        const hashedToken = await generateHashedToken(token)
         const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24) // 24hs
-        await this.authRepository.createToken(user.id, token, 'EMAIL_VERIFICATION', expiresAt)
+        await this.authRepository.createToken(user.id, hashedToken, 'EMAIL_VERIFICATION', expiresAt)
         await emailService.sendVerificationEmail(user.email, token)
     }
 
     async verifyEmail(token: string) {
-        const dbToken = await this.authRepository.findToken(token, 'EMAIL_VERIFICATION')
+        const hashedToken = await generateHashedToken(token)
+        const dbToken = await this.authRepository.findToken(hashedToken, 'EMAIL_VERIFICATION')
         if(!dbToken || dbToken.expiresAt < new Date()) throw new AppError('Token inválido o expirado', 400)
         
         await this.authRepository.updateUser(dbToken.userId, { confirmed: true })
@@ -111,13 +112,15 @@ export class AuthService {
 
         await this.authRepository.deleteTokensByUser(user.id, 'PASSWORD_RESET')
         const token = await generateToken()
+        const hashedToken = await generateHashedToken(token)
         const expiresAt = new Date(Date.now() + 1000 * 60 * 60) // 1h
-        await this.authRepository.createToken(user.id, token, 'PASSWORD_RESET', expiresAt)
+        await this.authRepository.createToken(user.id, hashedToken, 'PASSWORD_RESET', expiresAt)
         await emailService.sendPasswordResetEmail(user.email, token)
     }
 
     async resetPassword(token: string, password: string) {
-        const dbToken = await this.authRepository.findToken(token, 'PASSWORD_RESET')
+        const hashedToken = await generateHashedToken(token)
+        const dbToken = await this.authRepository.findToken(hashedToken, 'PASSWORD_RESET')
         if(!dbToken || dbToken.expiresAt < new Date()) throw new AppError('Token inválido o expirado', 400)
         
         const hashedPassword = await hashPassword(password)
@@ -132,11 +135,12 @@ export class AuthService {
 
         const totp = getTotp(user.email)
         const secret = totp.generateSecret()
+        const {encryptedSecret, iv} = generateEncrypted(secret)
         const otpauthUrl = totp.toURI({ secret })
         
         console.log(`[DEV MODE] 🔐 2FA Secret para ${user.email}: ${secret}`)
         
-        await this.authRepository.updateUser(user.id, { twoFactorSecret: secret })
+        await this.authRepository.updateUser(user.id, { twoFactorSecret: encryptedSecret,  twoFactorIv: iv})
         return otpauthUrl
     }
 
@@ -144,8 +148,10 @@ export class AuthService {
         const user = await this.authRepository.findById(userId)
         if(!user || !user.twoFactorSecret) throw new AppError('Configuración 2FA incompleta', 400)
         
+        const decryptSecret = decryptData(user.twoFactorSecret, user.twoFactorIv)
+
         const totp = getTotp(user.email)
-        const result = await totp.verify(code, { secret: user.twoFactorSecret })
+        const result = await totp.verify(code, { secret: decryptSecret })
         if(!result.valid) throw new AppError('Código inválido', 400)
         
         await this.authRepository.updateUser(user.id, { isTwoFactorEnabled: true })
@@ -155,8 +161,10 @@ export class AuthService {
         const user = await this.authRepository.findById(userId)
         if(!user || !user.isTwoFactorEnabled || !user.twoFactorSecret) throw new AppError('2FA no configurado', 400)
 
+        const decryptSecret = decryptData(user.twoFactorSecret, user.twoFactorIv)
+
         const totp = getTotp(user.email)
-        const result = await totp.verify(code, { secret: user.twoFactorSecret })
+        const result = await totp.verify(code, { secret: decryptSecret })
         if(!result.valid) throw new AppError('Código inválido', 400)
 
         return generateJWT({ id: user.id }, process.env.JWT_SECRET_KEY, '7d')

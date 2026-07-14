@@ -22,6 +22,7 @@ model User {
   confirmed          Boolean @default(false)
   phoneNumber        String?
   twoFactorSecret    String?
+  twoFactorIv        String?
   isTwoFactorEnabled Boolean @default(false)
   avatar             String?
 
