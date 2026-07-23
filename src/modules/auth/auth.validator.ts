@@ -1,5 +1,6 @@
 import { body } from "express-validator"
 import { handleInputErrors } from "../../middleware/validation"
+import { validatePhoneNumber, validatePhoneNumberOptional } from "../../validators/common"
 
 export const validateRegister = [
     body('name').notEmpty().withMessage('El nombre no puede ir vacío'),
@@ -7,7 +8,7 @@ export const validateRegister = [
     body('password').isLength({ min: 8 }).withMessage('La contraseña es muy corta'),
     body('username').notEmpty().withMessage('El nombre de usuario no puede ir vacío'),
     body('role').optional().isIn(['USER', 'OWNER']).withMessage('El rol debe ser válido'),
-    body('phoneNumber').optional().isString().withMessage('El teléfono no es válido'),
+    validatePhoneNumberOptional,
     handleInputErrors
 ]
 
@@ -18,7 +19,7 @@ export const validateLogin = [
 ]
 
 export const validateBecomeOwner = [
-    body('phoneNumber').notEmpty().withMessage('El teléfono es obligatorio'),
+    validatePhoneNumber,
     handleInputErrors
 ]
 

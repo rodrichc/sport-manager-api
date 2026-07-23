@@ -1,9 +1,10 @@
 import { body } from "express-validator"
 import { handleInputErrors } from "../../middleware/validation"
+import { validatePhoneNumberOptional } from "../../validators/common"
 
 export const validateUpdateProfile = [
     body('name').optional().notEmpty().withMessage('El nombre no puede ir vacío'),
-    body('phoneNumber').optional().isString(),
+    validatePhoneNumberOptional,
     body('avatar').optional().isString(),
     handleInputErrors
 ]
