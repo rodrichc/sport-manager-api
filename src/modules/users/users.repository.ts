@@ -2,8 +2,11 @@ import { db } from "../../config/db"
 import { UserId } from "../../types"
 
 export class UsersRepository {
-    async findById(id: UserId) {
-        return await db.user.findUnique({ where: { id } })
+    async getPasswordById(id: UserId) {
+        return await db.user.findUnique({ 
+            where: { id },
+            select: { password: true }
+        })
     }
 
     async updateProfile(id: UserId, data: any) {

@@ -12,7 +12,7 @@ export class UsersService {
 
     async updatePassword(userId: UserId, data: any) {
         const { currentPassword, newPassword } = data
-        const user = await this.usersRepository.findById(userId)
+        const user = await this.usersRepository.getPasswordById(userId)
         
         if (!user) throw new AppError('Usuario no encontrado', 404)
         
