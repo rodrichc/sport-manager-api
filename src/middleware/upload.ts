@@ -1,8 +1,7 @@
 import multer from 'multer';
-import { cloudinaryStorage } from '../services/storage/CloudinaryStorageService';
 
 export const uploadImageMiddleware = multer({
-  storage: cloudinaryStorage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (_req, file, cb) => {
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
