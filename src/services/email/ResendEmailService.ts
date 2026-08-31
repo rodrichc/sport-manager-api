@@ -1,5 +1,6 @@
 import { Resend } from "resend"
 import { IEmailService } from "./IEmailService"
+import { env } from "../../config/env"
 
 export class ResendEmailService implements IEmailService {
     private resend: Resend
@@ -7,9 +8,9 @@ export class ResendEmailService implements IEmailService {
     private baseUrl: string
 
     constructor() {
-        this.resend = new Resend(process.env.RESEND_API_KEY)
-        this.fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
-        this.baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
+        this.resend = new Resend(env.RESEND_API_KEY)
+        this.fromEmail = env.RESEND_FROM_EMAIL 
+        this.baseUrl = env.FRONTEND_URL 
     }
 
     async sendVerificationEmail(email: string, token: string): Promise<void> {

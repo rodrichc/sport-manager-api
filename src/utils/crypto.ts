@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { env } from '../config/env';
 
 export async function generateToken(): Promise<string> {
     return crypto.randomBytes(32).toString('hex')
@@ -9,7 +10,7 @@ export async function generateHashedToken(token: string): Promise<string> {
 }
 
 export function generateEncrypted(secret: string): {encryptedSecret: string, iv: string}{
-    const keyString = process.env.ENCRYPTION_2FA_KEY;
+    const keyString = env.ENCRYPTION_2FA_KEY;
     if (!keyString) {
         throw new Error('ENCRYPTION_2FA_KEY no está definida en las variables de entorno.');
     }
@@ -32,7 +33,7 @@ export function generateEncrypted(secret: string): {encryptedSecret: string, iv:
 }
 
 export function decryptData(encryptedData: string, iv: string): string {
-    const keyString = process.env.ENCRYPTION_2FA_KEY;
+    const keyString = env.ENCRYPTION_2FA_KEY;
     if (!keyString) {
         throw new Error('ENCRYPTION_2FA_KEY no está definida en las variables de entorno.');
     }

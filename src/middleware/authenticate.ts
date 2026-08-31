@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express"
 import jwt from 'jsonwebtoken'
 import { db } from "../config/db"
 import { UserSafe } from "../types"
+import { env } from "../config/env"
 
 declare global {
     namespace Express {
@@ -27,7 +28,7 @@ export const authenticate = async(req: Request, res: Response, next: NextFunctio
     }
 
     try {
-        const result = jwt.verify(token, process.env.JWT_SECRET_KEY) as jwt.JwtPayload
+        const result = jwt.verify(token, env.JWT_SECRET_KEY) as jwt.JwtPayload
 
         if(typeof result === 'object' && result.id){
             const user = await db.user.findUnique({

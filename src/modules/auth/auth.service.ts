@@ -9,6 +9,7 @@ import { generateJWT } from "../../utils/jwt"
 import { createUsername } from "../../utils/slugify"
 import { getTotp } from "../../utils/totp"
 import { decryptData, generateEncrypted, generateHashedToken, generateToken } from "../../utils/crypto"
+import { env } from "../../config/env"
 
 const emailService: IEmailService = new ResendEmailService()
 
@@ -70,10 +71,10 @@ export class AuthService {
         if(!isPasswordCorrect) throw new AppError('Contraseña incorrecta', 403)
 
         if(user.isTwoFactorEnabled) {
-            return { tempToken: generateJWT({ id: user.id }, process.env.JWT_2FA_SECRET, '3m'), is2faRequired: true }
+            return { tempToken: generateJWT({ id: user.id }, env.JWT_2FA_SECRET, '3m'), is2faRequired: true }
         }
 
-        return { token: generateJWT({ id: user.id }, process.env.JWT_SECRET_KEY, '7d') }
+        return { token: generateJWT({ id: user.id }, env.JWT_SECRET_KEY, '7d') }
     }
 
     async becomeOwner(user: UserSafe, phoneNumber: UserPhoneNumber) {
@@ -167,6 +168,6 @@ export class AuthService {
         const result = await totp.verify(code, { secret: decryptSecret })
         if(!result.valid) throw new AppError('Código inválido', 400)
 
-        return generateJWT({ id: user.id }, process.env.JWT_SECRET_KEY, '7d')
+        return generateJWT({ id: user.id }, env.JWT_SECRET_KEY, '7d')
     }
 }

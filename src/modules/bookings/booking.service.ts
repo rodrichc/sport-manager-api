@@ -9,6 +9,7 @@ import { UserId } from "../../types"
 import type { PaginatedResponse, PaginationQuery } from "../../types/pagination"
 
 import { PaymentService } from "../payments/payment.service"
+import { env } from "../../config/env";
 
 export class BookingService {
 
@@ -18,7 +19,7 @@ export class BookingService {
     ) { }
 
     async create(userId: UserId, data: CreateBookingDTO) {
-        const COMPLEX_TIMEZONE = process.env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires'
+        const COMPLEX_TIMEZONE = env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires'
 
         const start = startOfMinute(new Date(data.startTime))
         const end = startOfMinute(new Date(data.endTime))
@@ -134,7 +135,7 @@ export class BookingService {
 
 
     async getAvailability(courtId: number, dateStr: string) {
-        const COMPLEX_TIMEZONE = process.env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires'
+        const COMPLEX_TIMEZONE = env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires'
 
         const court = await this.bookingRepository.getCourtPrice(courtId)
         if (!court) throw new AppError("Cancha no encontrada", 404)

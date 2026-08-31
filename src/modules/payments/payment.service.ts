@@ -3,16 +3,14 @@ import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 import { AppError } from "../../utils/appError";
 import { db } from "../../config/db";
 import { BookingStatus, PaymentStatus } from "@prisma/client";
+import { env } from "../../config/env";
 
 export class PaymentService {
     private client: MercadoPagoConfig;
     
     constructor(private readonly paymentRepository: PaymentRepository) {
-        if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
-            console.warn("MERCADOPAGO_ACCESS_TOKEN not set");
-        }
         this.client = new MercadoPagoConfig({ 
-            accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || "TEST-token", 
+            accessToken: env.MERCADOPAGO_ACCESS_TOKEN || "TEST-token", 
             options: { timeout: 5000 } 
         });
     }
@@ -20,7 +18,7 @@ export class PaymentService {
     async createPaymentIntention(bookingId: number, courtId: number, title: string, amount: number) {
         const preference = new Preference(this.client);
         
-        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+        const frontendUrl = env.FRONTEND_URL || "http://localhost:3000";
 
         const prefResponse = await preference.create({
             body: {
@@ -41,7 +39,7 @@ export class PaymentService {
                 metadata: {
                     booking_id: bookingId
                 },
-                notification_url: process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/payments/webhook` : undefined
+                notification_url: env.WEBHOOK_URL ? `${env.WEBHOOK_URL}/payments/webhook` : undefined
             }
         });
 

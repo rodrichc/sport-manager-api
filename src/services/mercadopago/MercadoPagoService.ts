@@ -1,15 +1,11 @@
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
+import { env } from '../../config/env';
 
 export class MercadoPagoService {
   private client: MercadoPagoConfig;
 
   constructor() {
-    const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
-    if (!accessToken) {
-      // Allow initializing but operations will fail. Or throw error. 
-      // It's usually better to warn and let it fail on usage, or throw.
-      console.warn('MERCADOPAGO_ACCESS_TOKEN is not defined in environment variables');
-    }
+    const accessToken = env.MERCADOPAGO_ACCESS_TOKEN;
 
     this.client = new MercadoPagoConfig({
       accessToken: accessToken || '',
@@ -41,12 +37,12 @@ export class MercadoPagoService {
         external_reference: bookingId.toString(),
         payer: payerEmail ? { email: payerEmail } : undefined,
         back_urls: {
-          success: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/payments/success` : 'http://localhost:3000/payments/success',
-          failure: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/payments/failure` : 'http://localhost:3000/payments/failure',
-          pending: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/payments/pending` : 'http://localhost:3000/payments/pending',
+          success: `${env.FRONTEND_URL}/payments/success`,
+          failure: `${env.FRONTEND_URL}/payments/failure`,
+          pending: `${env.FRONTEND_URL}/payments/pending`,
         },
         auto_return: 'approved',
-        notification_url: process.env.MERCADOPAGO_WEBHOOK_URL,
+        notification_url: env.MERCADOPAGO_WEBHOOK_URL,
       },
     });
 

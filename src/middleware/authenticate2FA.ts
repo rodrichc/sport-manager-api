@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express"
 import jwt from 'jsonwebtoken'
-import { db } from "../config/db"
 import { UserId } from "../types"
+import { env } from "../config/env"
 
 declare global {
     namespace Express {
@@ -27,7 +27,7 @@ export const authenticate2FA= async(req: Request, res: Response, next: NextFunct
     }
 
     try {
-        const result = jwt.verify(token, process.env.JWT_2FA_SECRET) as jwt.JwtPayload
+        const result = jwt.verify(token, env.JWT_2FA_SECRET) as jwt.JwtPayload
 
         if(typeof result === 'object' && result.id){
             req.userId = result.id

@@ -1,5 +1,6 @@
 import swaggerJSDoc from 'swagger-jsdoc'
 import { SwaggerUiOptions } from 'swagger-ui-express'
+import { env } from './env'
 
 const options: swaggerJSDoc.Options = {
     definition: {
@@ -11,7 +12,7 @@ const options: swaggerJSDoc.Options = {
         },
         servers: [
             {
-                url: `${process.env.BACKEND_URL}/api/v1`,
+                url: `${env.BACKEND_URL}/api/v1`,
                 description: 'Servidor Local'
             }
         ],
