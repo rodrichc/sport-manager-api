@@ -12,7 +12,10 @@ interface EnvConfig {
   DEFAULT_TIMEZONE: string;
   RESEND_API_KEY: string;
   RESEND_FROM_EMAIL: string;
-  CLOUDINARY_URL: string;
+  CLOUDINARY_CLOUD_NAME: string;
+  CLOUDINARY_API_KEY: string;
+  CLOUDINARY_API_SECRET: string;
+
 }
 
 const requiredEnvVars = [
@@ -21,7 +24,9 @@ const requiredEnvVars = [
   'JWT_2FA_SECRET',
   'ENCRYPTION_2FA_KEY',
   'RESEND_API_KEY',
-  'CLOUDINARY_URL',
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET'
 ] as const;
 
 
@@ -44,5 +49,7 @@ export const env: EnvConfig = {
   DEFAULT_TIMEZONE: process.env.DEFAULT_TIMEZONE || 'America/Argentina/Buenos_Aires',
   RESEND_API_KEY: process.env.RESEND_API_KEY!,
   RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
-  CLOUDINARY_URL: process.env.CLOUDINARY_URL!,
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME!,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY!,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET!,
 };
