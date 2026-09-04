@@ -5,10 +5,14 @@ import { AppError } from "../../utils/appError"
 import { paginateResponse } from "../../utils/paginate"
 import { CourtRepository } from "./court.repository"
 import { CourtDTO } from "./court.types"
+import { IStorageService } from "../../services/storage/IStorageService"
 
 export class CourtService {
 
-    constructor(private readonly courtRepository: CourtRepository) { }
+    constructor(
+        private readonly courtRepository: CourtRepository,
+        private readonly storageService: IStorageService
+    ) { }
 
     async create(userId: UserId, courtData: CourtDTO) {
         await this.getComplexOrThrow(courtData.complexId, userId)
@@ -32,6 +36,18 @@ export class CourtService {
         const court = await this.getCourtOrThrow(id)
 
         await this.getComplexOrThrow(court.complexId, userId)
+
+        if (courtData.images && Array.isArray(courtData.images)) {
+            const imagesToDelete = court.images.filter(
+                (oldUrl) => !courtData.images!.includes(oldUrl)
+            )
+
+            if (imagesToDelete.length > 0) {
+                await Promise.all(
+                    imagesToDelete.map((url) => this.storageService.deleteFile(url))
+                )
+            }
+        }
 
         return await this.courtRepository.update(id, courtData)
     }
@@ -125,6 +141,12 @@ export class CourtService {
         const court = await this.getCourtDeletedOrThrow(id)
 
         await this.getComplexOrThrow(court.complexId, userId)
+
+        if (court.images && court.images.length > 0) {
+            await Promise.all(
+                court.images.map((url) => this.storageService.deleteFile(url))
+            )
+        }
 
         return await this.courtRepository.hardDelete(id)
     }

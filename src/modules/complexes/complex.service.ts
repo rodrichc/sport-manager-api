@@ -5,11 +5,15 @@ import { AppError } from "../../utils/appError";
 import { paginateResponse } from "../../utils/paginate";
 import { ComplexRepository } from "./complex.repository";
 import { ComplexStatus, CreateComplexDTO, ScheduleInput, UpdateComplexDTO } from "./complex.types";
+import { IStorageService } from "../../services/storage/IStorageService";
 
 
 export class ComplexService {
 
-    constructor(private readonly complexRepository: ComplexRepository) { }
+    constructor(
+        private readonly complexRepository: ComplexRepository,
+        private readonly storageService: IStorageService
+    ) { }
 
     async create(data: CreateComplexDTO, user: UserSafe) {
 
@@ -59,6 +63,22 @@ export class ComplexService {
     async update(data: UpdateComplexDTO, user: UserSafe, id: ComplexId) {
         const complex = await this.complexRepository.findActiveById(id)
         this.getComplexOrThrow(complex, user)
+
+        if (data.logo && complex.logo && data.logo !== complex.logo) {
+            await this.storageService.deleteFile(complex.logo);
+        }
+
+        if (data.images && Array.isArray(data.images)) {
+            const imagesToDelete = complex.images.filter(
+                (oldUrl) => !data.images!.includes(oldUrl)
+            );
+
+            if (imagesToDelete.length > 0) {
+                await Promise.all(
+                    imagesToDelete.map((url) => this.storageService.deleteFile(url))
+                );
+            }
+        }
 
         return await this.complexRepository.update(id, data)
     }
@@ -119,6 +139,21 @@ export class ComplexService {
 
         if (!complex.deletedAt) {
             throw new AppError("El complejo no está eliminado", 400)
+        }
+
+        const filesToDelete: string[] = [];
+        if (complex.logo) {
+            filesToDelete.push(complex.logo);
+        }
+
+        if (complex.images && complex.images.length > 0) {
+            filesToDelete.push(...complex.images);
+        }
+
+        if (filesToDelete.length > 0) {
+            await Promise.all(
+                filesToDelete.map((url) => this.storageService.deleteFile(url))
+            );
         }
 
         return await this.complexRepository.hardDelete(id)

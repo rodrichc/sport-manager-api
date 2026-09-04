@@ -9,6 +9,13 @@ export class UsersRepository {
         })
     }
 
+    async findAvatarById(id: UserId) {
+        return await db.user.findUnique({ 
+            where: { id },
+            select: { avatar: true },
+        })
+    }
+
     async updateProfile(id: UserId, data: any) {
         return await db.user.update({
             where: { id },
