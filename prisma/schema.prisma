@@ -157,7 +157,9 @@ model Review {
   complex   Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
 
+  @@unique([userId, complexId])
   @@index([complexId])
   @@index([userId])
 }
