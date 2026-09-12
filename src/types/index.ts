@@ -1,4 +1,4 @@
-import { Complex, Court, User } from '@prisma/client'
+import { Booking, Complex, Court, User } from '@prisma/client'
 
 
 export type UserSafe = Pick<User, 'id' | 'name' | 'email' | 'username' | 'role' | 'isTwoFactorEnabled'>
@@ -8,3 +8,5 @@ export type UserId = User['id']
 export type ComplexId = Complex["id"]
 
 export type CourtId = Court["id"]
+
+export type BookingId = Booking["id"]

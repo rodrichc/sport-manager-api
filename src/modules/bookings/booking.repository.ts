@@ -1,8 +1,9 @@
 import { Booking } from "@prisma/client"
 import { db } from "../../config/db";
 import { BookingStatus } from "@prisma/client"
+import { subMinutes } from "date-fns";
 import { CreateBookingDTO } from "./booking.types"
-import { ComplexId, CourtId, UserId } from "../../types";
+import { BookingId, ComplexId, CourtId, UserId } from "../../types";
 import type { PaginatedResult } from "../../types/pagination";
 
 export class BookingRepository {
@@ -74,19 +75,23 @@ export class BookingRepository {
         })
     }
 
-    async findBookingsInRange(courtId: number, rangeStart: Date, rangeEnd: Date) {
+    async findBookingsInRange(courtId: number, start: Date, end: Date) {
+        const tenMinutesAgo = subMinutes(new Date(), 10);
+
         return await db.booking.findMany({
             where: {
-                courtId: courtId,
-                startTime: {
-                    lt: rangeEnd
-                },
-                endTime: {
-                    gt: rangeStart
-                },
-                status: {
-                    not: 'CANCELLED'
-                }
+                courtId,
+                
+                startTime: { lt: end },
+                endTime: { gt: start },
+                
+                OR: [
+                    { status: BookingStatus.CONFIRMED },
+                    {
+                        status: BookingStatus.PENDING,
+                        createdAt: { gt: tenMinutesAgo } 
+                    }
+                ]
             }
         });
     }
@@ -128,4 +133,10 @@ export class BookingRepository {
             orderBy
         })
     }
+
+    async delete(id: BookingId) {
+    return await db.booking.delete({
+        where: { id }
+    });
+}
 }

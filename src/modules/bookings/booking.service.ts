@@ -98,23 +98,24 @@ export class BookingService {
         }
 
         // ---------------------------------------------------------
-        //                  PRICE AND CREATE
+        //                   PRICE AND CREATE
         // ---------------------------------------------------------
+        const totalPrice = Math.round((Number(court.price) / 60) * duration);
 
-        const totalPrice = Math.round((Number(court.price) / 60) * duration)
+        let newBooking: Booking | null = null;
 
         try {
-            const newBooking = await this.bookingRepository.create({
+            newBooking = await this.bookingRepository.create({
                 courtId: data.courtId,
                 userId,
                 startTime: start,
                 endTime: end,
                 totalPrice
-            })
+            });
 
             const payment = await this.paymentService.createPaymentIntention(
-                 newBooking.id, 
-                 userId, 
+                newBooking.id, 
+                userId
             );
 
             return {
@@ -123,10 +124,21 @@ export class BookingService {
             };
 
         } catch (error: any) {
-            if (error.message === "COLLISION_DETECTED") {
-                throw new AppError("La cancha ya fue reservada por otro usuario dentro de ese horario", 409)
+            // Rollback: si se llegó a crear la reserva pero falló Mercado Pago
+            if (newBooking) {
+                try {
+                    await this.bookingRepository.delete(newBooking.id);
+                    console.warn(`[ROLLBACK] Reserva huérfana eliminada ID: ${newBooking.id}`);
+                } catch (deleteError) {
+                    console.error(`[ROLLBACK ERROR] No se pudo eliminar la reserva ID: ${newBooking.id}`, deleteError);
+                }
             }
-            throw error
+
+            if (error.message === "COLLISION_DETECTED") {
+                throw new AppError("La cancha ya fue reservada por otro usuario dentro de ese horario", 409);
+            }
+
+            throw error;
         }
     }
 
