@@ -15,7 +15,9 @@ interface EnvConfig {
   CLOUDINARY_CLOUD_NAME: string;
   CLOUDINARY_API_KEY: string;
   CLOUDINARY_API_SECRET: string;
-
+  MERCADOPAGO_ACCESS_TOKEN: string;
+  APP_PUBLIC_URL: string;
+  WEBHOOK_URL: string;
 }
 
 const requiredEnvVars = [
@@ -26,7 +28,9 @@ const requiredEnvVars = [
   'RESEND_API_KEY',
   'CLOUDINARY_CLOUD_NAME',
   'CLOUDINARY_API_KEY',
-  'CLOUDINARY_API_SECRET'
+  'CLOUDINARY_API_SECRET',
+  'MERCADOPAGO_ACCESS_TOKEN',
+  'WEBHOOK_URL',
 ] as const;
 
 
@@ -52,4 +56,7 @@ export const env: EnvConfig = {
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME!,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY!,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET!,
+  MERCADOPAGO_ACCESS_TOKEN: process.env.MERCADOPAGO_ACCESS_TOKEN,
+  APP_PUBLIC_URL: process.env.APP_PUBLIC_URL,
+  WEBHOOK_URL: process.env.WEBHOOK_URL,
 };

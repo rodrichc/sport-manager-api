@@ -114,9 +114,7 @@ export class BookingService {
 
             const payment = await this.paymentService.createPaymentIntention(
                  newBooking.id, 
-                 newBooking.courtId, 
-                 `Reserva en cancha ${court.name || 'Padel'}`, 
-                 totalPrice
+                 userId, 
             );
 
             return {
