@@ -42,7 +42,7 @@ export class MercadoPagoService {
           pending: `${env.FRONTEND_URL}/payments/pending`,
         },
         auto_return: 'approved',
-        notification_url: env.MERCADOPAGO_WEBHOOK_URL,
+        notification_url: env.WEBHOOK_URL,
       },
     });
 
