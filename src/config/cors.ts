@@ -6,7 +6,7 @@ export const corsConfig: CorsOptions = {
         const whiteList = [env.FRONTEND_URL, env.BACKEND_URL]
 
         if(process.argv[2] === '--api' || env.NODE_ENV === 'test' || env.NODE_ENV === 'development') {
-            whiteList.push(undefined)
+            return callback(null, true);
         }
 
         if(whiteList.includes(origin)){
