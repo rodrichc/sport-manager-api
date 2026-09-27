@@ -18,14 +18,14 @@ jest.mock('mercadopago', () => {
                 if (id === 'approved_id') {
                     return {
                         status: 'approved',
-                        metadata: { booking_id: '9999' },
+                        external_reference: '9999',
                         payment_method_id: 'visa',
                         status_detail: 'accredited'
                     }
                 } else if (id === 'rejected_id') {
                     return {
                         status: 'rejected',
-                        metadata: { booking_id: '9999' },
+                        external_reference: '9999',
                         payment_method_id: 'visa',
                         status_detail: 'cc_rejected_other_reason'
                     }

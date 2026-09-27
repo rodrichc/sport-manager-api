@@ -39,9 +39,11 @@ export class PaymentRepository {
         });
     }
 
-    async approvePaymentAndConfirmBooking(
+    async updatePaymentAndBookingStatus(
         paymentId: number,
         bookingId: number,
+        paymentStatus: PaymentStatus,
+        bookingStatus: BookingStatus,
         mercadopagoPaymentId: string,
         paymentMethod?: string
     ) {
@@ -49,7 +51,7 @@ export class PaymentRepository {
             db.payment.update({
                 where: { id: paymentId },
                 data: {
-                    status: PaymentStatus.APPROVED,
+                    status: paymentStatus,
                     mercadopagoPaymentId,
                     paymentMethod
                 }
@@ -57,7 +59,7 @@ export class PaymentRepository {
             db.booking.update({
                 where: { id: bookingId },
                 data: {
-                    status: BookingStatus.CONFIRMED
+                    status: bookingStatus
                 }
             })
         ]);

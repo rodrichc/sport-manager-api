@@ -251,7 +251,11 @@ describe('AuthService', () => {
             )
 
             // Verificar que generó el JWT con el id del usuario
-            expect(generateJWT).toHaveBeenCalledWith({ id: EXISTING_USER.id })
+            expect(generateJWT).toHaveBeenCalledWith( 
+                { id: EXISTING_USER.id },
+                expect.any(String), 
+                '7d' 
+            )
 
             // Verificar que retorna el token
             expect(result).toEqual({ token: 'fake.jwt.token' })

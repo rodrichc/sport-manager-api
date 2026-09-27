@@ -47,26 +47,26 @@ describe('parsePagination', () => {
         })
     })
 
-    it('debe usar default pageSize=10 si solo se envía page', () => {
+    it('debe usar default pageSize=9 si solo se envía page', () => {
         mockReq.query = { page: '3' }
 
         parsePagination(mockReq as Request, mockRes as Response, mockNext)
 
         expect(mockReq.pagination).toEqual({
             page: 3,
-            pageSize: 10,
-            skip: 20,
-            take: 10,
+            pageSize: 9,
+            skip: 18,
+            take: 9,
         })
     })
 
-    it('debe limitar pageSize a max 50', () => {
+    it('debe limitar pageSize a max 45', () => {
         mockReq.query = { pageSize: '100' }
 
         parsePagination(mockReq as Request, mockRes as Response, mockNext)
 
-        expect(mockReq.pagination?.pageSize).toBe(50)
-        expect(mockReq.pagination?.take).toBe(50)
+        expect(mockReq.pagination?.pageSize).toBe(45)
+        expect(mockReq.pagination?.take).toBe(45)
     })
 
     it('debe usar mínimo 1 para page', () => {
@@ -87,16 +87,16 @@ describe('parsePagination', () => {
         expect(mockReq.pagination?.take).toBe(1)
     })
 
-    it('debe manejar valores no numéricos con fallback a defaults', () => {
+    it('debe manejar valores no numéricos con fallback a defaults (page=1, pageSize=9)', () => {
         mockReq.query = { page: 'abc', pageSize: 'xyz' }
 
         parsePagination(mockReq as Request, mockRes as Response, mockNext)
 
         expect(mockReq.pagination).toEqual({
             page: 1,
-            pageSize: 10,
+            pageSize: 9,
             skip: 0,
-            take: 10,
+            take: 9,
         })
     })
 })

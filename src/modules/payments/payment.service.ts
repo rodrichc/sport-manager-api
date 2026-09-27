@@ -121,9 +121,11 @@ export class PaymentService {
             return;
         }
 
-        await this.paymentRepository.approvePaymentAndConfirmBooking(
+        await this.paymentRepository.updatePaymentAndBookingStatus(
             payment.id,
             bookingId,
+            dbStatus,
+            bookingStatus,
             paymentIdStr,
             paymentData.payment_method_id
         );
